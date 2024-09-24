@@ -34,7 +34,7 @@ func (v Values) Get(key string) string {
 	return v.m[key]
 }
 
-var messageTypes = []string{"Message", "ReadReceipt", "Presence", "HistorySync", "ChatPresence", "All"}
+var messageTypes = []string{"Message", "ReadReceipt", "Presence", "HistorySync", "ChatPresence", "GroupJoined", "GroupInfo", "PairSuccess", "All"}
 
 func (s *server) authadmin(next http.Handler) http.Handler {
     return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -3575,7 +3575,7 @@ func (s *server) AddUser() http.HandlerFunc {
 		}
 
 		// Validate the events input
-		validEvents := []string{"Message", "ReadReceipt", "Presence", "HistorySync", "ChatPresence", "All"}
+		validEvents := []string{"Message", "ReadReceipt", "Presence", "HistorySync", "ChatPresence", "GroupJoined", "GroupInfo", "PairSuccess", "All"}
 		eventList := strings.Split(user.Events, ",")
 		for _, event := range eventList {
 			event = strings.TrimSpace(event)

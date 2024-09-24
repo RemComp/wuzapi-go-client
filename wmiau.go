@@ -316,6 +316,8 @@ func (mycli *MyClient) myEventHandler(rawEvt interface{}) {
 			return
 		}
 	case *events.PairSuccess:
+		postmap["type"] = "PairSuccess"
+		dowebhook = 1
 		log.Info().Str("userid",strconv.Itoa(mycli.userID)).Str("token",mycli.token).Str("ID",evt.ID.String()).Str("BusinessName",evt.BusinessName).Str("Platform",evt.Platform).Msg("QR Pair Success")
 		jid := evt.ID
 		sqlStmt := `UPDATE users SET jid=? WHERE id=?`
@@ -338,6 +340,12 @@ func (mycli *MyClient) myEventHandler(rawEvt interface{}) {
 	case *events.StreamReplaced:
 		log.Info().Msg("Received StreamReplaced event")
 		return
+	case *events.JoinedGroup:
+		postmap["type"] = "GroupJoined"
+		dowebhook = 1
+	case *events.GroupInfo:
+		postmap["type"] = "GroupInfo"
+		dowebhook = 1
 	case *events.Message:
 		postmap["type"] = "Message"
 		dowebhook = 1
