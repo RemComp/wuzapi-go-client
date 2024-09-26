@@ -3534,6 +3534,7 @@ func (s *server) ListUsers() http.HandlerFunc {
                 "webhook":    webhook,
                 "jid":        jid,
                 "connected":  connected == 1,
+				"loggedIn":   clientPointer[id].IsLoggedIn(),
                 "expiration": expiration,
                 "events":     events,
             }
