@@ -3527,6 +3527,11 @@ func (s *server) ListUsers() http.HandlerFunc {
                 connected = int(connectedNull.Int64)
             }
 
+			loggedIn := false
+			if clientPointer[id] != nil {
+				loggedIn = clientPointer[id].IsLoggedIn()
+			}
+
             user := map[string]interface{}{
                 "id":         id,
                 "name":       name,
@@ -3534,7 +3539,7 @@ func (s *server) ListUsers() http.HandlerFunc {
                 "webhook":    webhook,
                 "jid":        jid,
                 "connected":  connected == 1,
-				"loggedIn":   clientPointer[id].IsLoggedIn(),
+				"loggedIn":   loggedIn,
                 "expiration": expiration,
                 "events":     events,
             }
