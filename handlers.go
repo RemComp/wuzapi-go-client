@@ -690,6 +690,7 @@ func (s *server) SendAudio() http.HandlerFunc {
 		Audio       string
 		Caption     string
 		Id          string
+		Seconds	 	*int
 		ContextInfo waProto.ContextInfo
 	}
 
@@ -721,6 +722,11 @@ func (s *server) SendAudio() http.HandlerFunc {
 		if t.Audio == "" {
 			s.Respond(w, r, http.StatusBadRequest, errors.New("Missing Audio in Payload"))
 			return
+		}
+
+		SecondsAudio := 0
+		if t.Seconds != nil {
+			SecondsAudio = *t.Seconds
 		}
 
 		recipient, err := validateMessageFields(t.Phone, t.ContextInfo.StanzaID, t.ContextInfo.Participant)
@@ -782,6 +788,7 @@ func (s *server) SendAudio() http.HandlerFunc {
 			FileSHA256:    uploaded.FileSHA256,
 			FileLength:    proto.Uint64(uint64(len(filedata))),
             PTT:           &ptt,
+			Seconds: 	   proto.Uint32(uint32(SecondsAudio)),
 		}}
 
 		if t.ContextInfo.StanzaID != nil {
