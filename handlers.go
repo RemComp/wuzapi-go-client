@@ -739,45 +739,45 @@ func (s *server) SendAudio() http.HandlerFunc {
 		var uploaded whatsmeow.UploadResponse
 		var filedata []byte
 
-		// if t.Audio[0:14] == "data:audio/ogg" {
-		// 	dataURL, err := dataurl.DecodeString(t.Audio)
-		// 	if err != nil {
-		// 		s.Respond(w, r, http.StatusBadRequest, errors.New("Could not decode base64 encoded data from payload"))
-		// 		return
-		// 	} else {
-		// 		filedata = dataURL.Data
-		// 		uploaded, err = clientPointer[userid].Upload(context.Background(), filedata, whatsmeow.MediaAudio)
-		// 		if err != nil {
-		// 			s.Respond(w, r, http.StatusInternalServerError, errors.New(fmt.Sprintf("Failed to upload file: %v", err)))
-		// 			return
-		// 		}
-		// 	}
-		// } else {
-		// 	s.Respond(w, r, http.StatusBadRequest, errors.New("Audio data should start with \"data:audio/ogg;base64,\""))
-		// 	return
-		// }
-		dataURL, err := dataurl.DecodeString(t.Audio)
-		if err != nil {
-			s.Respond(w, r, http.StatusBadRequest, errors.New("Could not decode base64 encoded data from payload"))
-			return
-		} else {
-			filedata = dataURL.Data
-			uploaded, err = clientPointer[userid].Upload(context.Background(), filedata, whatsmeow.MediaAudio)
+		if t.Audio[0:14] == "data:audio/ogg" {
+			dataURL, err := dataurl.DecodeString(t.Audio)
 			if err != nil {
-				s.Respond(w, r, http.StatusInternalServerError, errors.New(fmt.Sprintf("Failed to upload file: %v", err)))
+				s.Respond(w, r, http.StatusBadRequest, errors.New("Could not decode base64 encoded data from payload"))
 				return
+			} else {
+				filedata = dataURL.Data
+				uploaded, err = clientPointer[userid].Upload(context.Background(), filedata, whatsmeow.MediaAudio)
+				if err != nil {
+					s.Respond(w, r, http.StatusInternalServerError, errors.New(fmt.Sprintf("Failed to upload file: %v", err)))
+					return
+				}
 			}
+		} else {
+			s.Respond(w, r, http.StatusBadRequest, errors.New("Audio data should start with \"data:audio/ogg;base64,\""))
+			return
 		}
+		// dataURL, err := dataurl.DecodeString(t.Audio)
+		// if err != nil {
+		// 	s.Respond(w, r, http.StatusBadRequest, errors.New("Could not decode base64 encoded data from payload"))
+		// 	return
+		// } else {
+		// 	filedata = dataURL.Data
+		// 	uploaded, err = clientPointer[userid].Upload(context.Background(), filedata, whatsmeow.MediaAudio)
+		// 	if err != nil {
+		// 		s.Respond(w, r, http.StatusInternalServerError, errors.New(fmt.Sprintf("Failed to upload file: %v", err)))
+		// 		return
+		// 	}
+		// }
 
         ptt := true
-        // mime := "audio/ogg; codecs=opus"
+        mime := "audio/ogg; codecs=opus"
 
 		msg := &waProto.Message{AudioMessage: &waProto.AudioMessage{
 			URL:           proto.String(uploaded.URL),
 			DirectPath:    proto.String(uploaded.DirectPath),
 			MediaKey:      uploaded.MediaKey,
-            Mimetype:      proto.String(http.DetectContentType(filedata)),
-			// Mimetype:      &mime,
+            // Mimetype:      proto.String(http.DetectContentType(filedata)),
+			Mimetype:      &mime,
 			FileEncSHA256: uploaded.FileEncSHA256,
 			FileSHA256:    uploaded.FileSHA256,
 			FileLength:    proto.Uint64(uint64(len(filedata))),
