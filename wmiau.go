@@ -512,7 +512,7 @@ func (mycli *MyClient) myEventHandler(rawEvt interface{}) {
 		if webhookurl != "" {
 			log.Info().Str("url",webhookurl).Msg("Calling webhook")
 			values, _ := json.Marshal(postmap)
-			if path == "" {
+			if stringBase64Media == "" {
 				data := map[string]string{
 					"jsonData":  string(values),
 					"token": mycli.token,
