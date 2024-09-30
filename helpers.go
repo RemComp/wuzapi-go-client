@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"strconv"
 )
 
@@ -38,23 +37,24 @@ func callHook(myurl string, payload map[string]string, id int) {
 }
 
 // webhook for messages with file attachments
-func callHookFile(myurl string, payload map[string]string, id int, file string) error {
-    log.Info().Str("file", file).Str("url", myurl).Msg("Sending POST")
+// func callHookFile(myurl string, payload map[string]string, id int, filename string, file io.Reader) error {
+//     log.Info().Str("file", filename).Str("url", myurl).Msg("Sending POST")
 
-    resp, err := clientHttp[id].R().
-        SetFiles(map[string]string{
-            "file": file,
-        }).
-        SetFormData(payload).
-        Post(myurl)
+//     resp, err := clientHttp[id].R().
+//         // SetFiles(map[string]string{
+//         //     "file": file,
+//         // }).
+//         SetFileReader("file", filename, file).
+//         SetFormData(payload).
+//         Post(myurl)
 
-    if err != nil {
-        log.Error().Err(err).Str("url", myurl).Msg("Failed to send POST request")
-        return fmt.Errorf("failed to send POST request: %w", err)
-    }
+//     if err != nil {
+//         log.Error().Err(err).Str("url", myurl).Msg("Failed to send POST request")
+//         return fmt.Errorf("failed to send POST request: %w", err)
+//     }
 
-    // Optionally, you can log the response status
-    log.Info().Int("status", resp.StatusCode()).Msg("POST request completed")
+//     // Optionally, you can log the response status
+//     log.Info().Int("status", resp.StatusCode()).Msg("POST request completed")
 
-    return nil
-}
+//     return nil
+// }

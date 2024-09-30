@@ -7,7 +7,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"mime"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -280,6 +279,7 @@ func (mycli *MyClient) myEventHandler(rawEvt interface{}) {
 	postmap["event"] = rawEvt
 	dowebhook := 0
 	path := ""
+	stringBase64Media := ""
 
 	ex, err := os.Executable()
 	if err != nil {
@@ -368,103 +368,39 @@ func (mycli *MyClient) myEventHandler(rawEvt interface{}) {
 		// try to get Image if any
 		img := evt.Message.GetImageMessage()
 		if img != nil {
-
-			// check/creates user directory for files
-			userDirectory := filepath.Join(exPath, "files", "user_"+txtid)
-			_, err := os.Stat(userDirectory)
-			if os.IsNotExist(err) {
-				errDir := os.MkdirAll(userDirectory, 0751)
-				if errDir != nil {
-					log.Error().Err(errDir).Msg("Could not create user directory")
-					return
-				}
-			}
-
 			data, err := mycli.WAClient.Download(img)
 			if err != nil {
 				log.Error().Err(err).Msg("Failed to download image")
 				return
 			}
-			exts, _ := mime.ExtensionsByType(img.GetMimetype())
-			path = filepath.Join(userDirectory, evt.Info.ID+exts[0])
-			err = os.WriteFile(path, data, 0600)
-			if err != nil {
-				log.Error().Err(err).Msg("Failed to save image")
-				return
-			}
+			mimetype := img.GetMimetype()
+			stringBase64Media = "data:" + mimetype + ";base64," + base64.StdEncoding.EncodeToString(data)
 			log.Info().Str("path",path).Msg("Image saved")
 		}
 
 		// try to get Audio if any
 		audio := evt.Message.GetAudioMessage()
 		if audio != nil {
-
-			// check/creates user directory for files
-			userDirectory := filepath.Join(exPath, "files", "user_"+txtid)
-			_, err := os.Stat(userDirectory)
-			if os.IsNotExist(err) {
-				errDir := os.MkdirAll(userDirectory, 0751)
-				if errDir != nil {
-					log.Error().Err(errDir).Msg("Could not create user directory")
-					return
-				}
-			}
-
 			data, err := mycli.WAClient.Download(audio)
 			if err != nil {
 				log.Error().Err(err).Msg("Failed to download audio")
 				return
 			}
-			exts, _ := mime.ExtensionsByType(audio.GetMimetype())
-			var ext string
-			if len(exts) > 0 {
-				ext = exts[0]
-			} else {
-				ext = ".ogg"
-			}
-			path = filepath.Join(userDirectory, evt.Info.ID+ext)
-			err = os.WriteFile(path, data, 0600)
-			if err != nil {
-				log.Error().Err(err).Msg("Failed to save audio")
-				return
-			}
+			mimetype := audio.GetMimetype()
+			stringBase64Media = "data:" + mimetype + ";base64," + base64.StdEncoding.EncodeToString(data)
 			log.Info().Str("path",path).Msg("Audio saved")
 		}
 
 		// try to get Document if any
 		document := evt.Message.GetDocumentMessage()
 		if document != nil {
-
-			// check/creates user directory for files
-			userDirectory := filepath.Join(exPath, "files", "user_"+txtid)
-			_, err := os.Stat(userDirectory)
-			if os.IsNotExist(err) {
-				errDir := os.MkdirAll(userDirectory, 0751)
-				if errDir != nil {
-					log.Error().Err(errDir).Msg("Could not create user directory")
-					return
-				}
-			}
-
 			data, err := mycli.WAClient.Download(document)
 			if err != nil {
 				log.Error().Err(err).Msg("Failed to download document")
 				return
 			}
-			extension := ""
-			exts, err := mime.ExtensionsByType(document.GetMimetype())
-			if err != nil {
-				extension = exts[0]
-			} else {
-				filename := document.FileName
-				extension = filepath.Ext(*filename)
-			}
-			path = filepath.Join(userDirectory, evt.Info.ID+extension)
-			err = os.WriteFile(path, data, 0600)
-			if err != nil {
-				log.Error().Err(err).Msg("Failed to save document")
-				return
-			}
+			mimetype := document.GetMimetype()
+			stringBase64Media = "data:" + mimetype + ";base64," + base64.StdEncoding.EncodeToString(data)
 			log.Info().Str("path",path).Msg("Document saved")
 		}
 	case *events.Receipt:
@@ -576,24 +512,19 @@ func (mycli *MyClient) myEventHandler(rawEvt interface{}) {
 		if webhookurl != "" {
 			log.Info().Str("url",webhookurl).Msg("Calling webhook")
 			values, _ := json.Marshal(postmap)
-			data := map[string]string{
-				"jsonData":  string(values),
-				"token": mycli.token,
-			}
 			if path == "" {
+				data := map[string]string{
+					"jsonData":  string(values),
+					"token": mycli.token,
+				}
 				go callHook(webhookurl, data, mycli.userID)
 			} else {
-				// Create a channel to capture error from the goroutine
-				errChan := make(chan error, 1)
-				go func() {
-					err := callHookFile(webhookurl, data, mycli.userID, path)
-					errChan <- err
-				}()
-
-				// Optionally handle the error from the channel
-				if err := <-errChan; err != nil {
-					log.Error().Err(err).Msg("Error calling hook file")
+				data := map[string]string{
+					"jsonData":  string(values),
+					"base64": stringBase64Media,
+					"token": mycli.token,
 				}
+				go callHook(webhookurl, data, mycli.userID)
 			}
 		} else {
 			log.Warn().Str("userid",strconv.Itoa(mycli.userID)).Msg("No webhook set for user")
