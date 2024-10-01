@@ -278,7 +278,7 @@ func (mycli *MyClient) myEventHandler(rawEvt interface{}) {
 	postmap := make(map[string]interface{})
 	postmap["event"] = rawEvt
 	dowebhook := 0
-	path := ""
+	// path := ""
 	stringBase64Media := ""
 
 	ex, err := os.Executable()
@@ -365,44 +365,44 @@ func (mycli *MyClient) myEventHandler(rawEvt interface{}) {
 
 		log.Info().Str("id",evt.Info.ID).Str("source",evt.Info.SourceString()).Str("parts",strings.Join(metaParts,", ")).Msg("Message Received")
 
-		// try to get Image if any
-		img := evt.Message.GetImageMessage()
-		if img != nil {
-			data, err := mycli.WAClient.Download(img)
-			if err != nil {
-				log.Error().Err(err).Msg("Failed to download image")
-				return
-			}
-			mimetype := img.GetMimetype()
-			stringBase64Media = "data:" + mimetype + ";base64," + base64.StdEncoding.EncodeToString(data)
-			log.Info().Str("path",path).Msg("Image saved")
-		}
+		// // try to get Image if any
+		// img := evt.Message.GetImageMessage()
+		// if img != nil {
+		// 	data, err := mycli.WAClient.Download(img)
+		// 	if err != nil {
+		// 		log.Error().Err(err).Msg("Failed to download image")
+		// 		return
+		// 	}
+		// 	mimetype := img.GetMimetype()
+		// 	stringBase64Media = "data:" + mimetype + ";base64," + base64.StdEncoding.EncodeToString(data)
+		// 	log.Info().Str("path",path).Msg("Image saved")
+		// }
 
-		// try to get Audio if any
-		audio := evt.Message.GetAudioMessage()
-		if audio != nil {
-			data, err := mycli.WAClient.Download(audio)
-			if err != nil {
-				log.Error().Err(err).Msg("Failed to download audio")
-				return
-			}
-			mimetype := audio.GetMimetype()
-			stringBase64Media = "data:" + mimetype + ";base64," + base64.StdEncoding.EncodeToString(data)
-			log.Info().Str("path",path).Msg("Audio saved")
-		}
+		// // try to get Audio if any
+		// audio := evt.Message.GetAudioMessage()
+		// if audio != nil {
+		// 	data, err := mycli.WAClient.Download(audio)
+		// 	if err != nil {
+		// 		log.Error().Err(err).Msg("Failed to download audio")
+		// 		return
+		// 	}
+		// 	mimetype := audio.GetMimetype()
+		// 	stringBase64Media = "data:" + mimetype + ";base64," + base64.StdEncoding.EncodeToString(data)
+		// 	log.Info().Str("path",path).Msg("Audio saved")
+		// }
 
-		// try to get Document if any
-		document := evt.Message.GetDocumentMessage()
-		if document != nil {
-			data, err := mycli.WAClient.Download(document)
-			if err != nil {
-				log.Error().Err(err).Msg("Failed to download document")
-				return
-			}
-			mimetype := document.GetMimetype()
-			stringBase64Media = "data:" + mimetype + ";base64," + base64.StdEncoding.EncodeToString(data)
-			log.Info().Str("path",path).Msg("Document saved")
-		}
+		// // try to get Document if any
+		// document := evt.Message.GetDocumentMessage()
+		// if document != nil {
+		// 	data, err := mycli.WAClient.Download(document)
+		// 	if err != nil {
+		// 		log.Error().Err(err).Msg("Failed to download document")
+		// 		return
+		// 	}
+		// 	mimetype := document.GetMimetype()
+		// 	stringBase64Media = "data:" + mimetype + ";base64," + base64.StdEncoding.EncodeToString(data)
+		// 	log.Info().Str("path",path).Msg("Document saved")
+		// }
 	case *events.Receipt:
 		postmap["type"] = "ReadReceipt"
 		dowebhook = 1
