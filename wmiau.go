@@ -309,8 +309,14 @@ func (mycli *MyClient) myEventHandler(rawEvt interface{}) {
 		} else {
 			log.Info().Msg("Marked self as available")
 		}
-		sqlStmt := `UPDATE users SET connected=1 WHERE id=?`
-		_, err = mycli.db.Exec(sqlStmt, mycli.userID)
+		// get client jid
+		jid := mycli.WAClient.Store.ID
+		// log the jid and mycli.userID
+		log.Info().Str("jid",jid.String()).Str("userid",txtid).Msg("Connected to Whatsapp")
+		// update connected status and jid
+		// sqlStmt := `UPDATE users SET connected=1, jid=? WHERE id=?` update connected to 1 and pairing to 0 as well
+		sqlStmt := `UPDATE users SET connected=1, jid=?, pairing=0 WHERE id=?`
+		_, err = mycli.db.Exec(sqlStmt, jid, mycli.userID)
 		if err != nil {
 			log.Error().Err(err).Msg(sqlStmt)
 			return
@@ -320,7 +326,8 @@ func (mycli *MyClient) myEventHandler(rawEvt interface{}) {
 		dowebhook = 1
 		log.Info().Str("userid",strconv.Itoa(mycli.userID)).Str("token",mycli.token).Str("ID",evt.ID.String()).Str("BusinessName",evt.BusinessName).Str("Platform",evt.Platform).Msg("QR Pair Success")
 		jid := evt.ID
-		sqlStmt := `UPDATE users SET jid=? WHERE id=?`
+		// sqlStmt := `UPDATE users SET jid=? WHERE id=?` update pairing 0
+		sqlStmt := `UPDATE users SET jid=?, pairing=0 WHERE id=?`
 		_, err := mycli.db.Exec(sqlStmt, jid, mycli.userID)
 		if err != nil {
 			log.Error().Err(err).Msg(sqlStmt)

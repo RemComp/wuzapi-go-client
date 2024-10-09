@@ -210,7 +210,8 @@ func (s *server) Connect() http.HandlerFunc {
 				}
 			}
 			eventstring = strings.Join(subscribedEvents, ",")
-			_, err = s.db.Exec("UPDATE users SET events=? WHERE id=?", eventstring, userid)
+			// _, err = s.db.Exec("UPDATE users SET events=? WHERE id=?", eventstring, userid) update connected to 1 and pairing to 1 as well
+			_, err = s.db.Exec("UPDATE users SET events=?, connected=1, pairing=1 WHERE id=?", eventstring, userid)
 			if err != nil {
 				log.Warn().Msg("Could not set events in users table")
 			}
@@ -3505,7 +3506,7 @@ func (s *server) ListUsers() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
         // Query the database to get the list of users
-        rows, err := s.db.Query("SELECT id, name, token, webhook, jid, connected, expiration, events FROM users")
+        rows, err := s.db.Query("SELECT id, name, token, webhook, jid, connected, pairing, expiration, events FROM users")
         if err != nil {
 			s.Respond(w, r, http.StatusInternalServerError, errors.New("Problem accessing DB"))
             return
@@ -3520,10 +3521,11 @@ func (s *server) ListUsers() http.HandlerFunc {
             var id int
             var name, token, webhook, jid string
             var connectedNull sql.NullInt64
+			var pairingNull sql.NullInt64
             var expiration int
             var events string
 
-            err := rows.Scan(&id, &name, &token, &webhook, &jid, &connectedNull, &expiration, &events)
+            err := rows.Scan(&id, &name, &token, &webhook, &jid, &connectedNull, &pairingNull, &expiration, &events)
             if err != nil {
 			    s.Respond(w, r, http.StatusInternalServerError, errors.New("Problem accessing DB"))
                 return
@@ -3533,6 +3535,11 @@ func (s *server) ListUsers() http.HandlerFunc {
             if connectedNull.Valid {
                 connected = int(connectedNull.Int64)
             }
+
+			pairing := int(0)
+			if pairingNull.Valid {
+				pairing = int(pairingNull.Int64)
+			}
 
 			loggedIn := false
 			if clientPointer[id] != nil {
@@ -3546,6 +3553,7 @@ func (s *server) ListUsers() http.HandlerFunc {
                 "webhook":    webhook,
                 "jid":        jid,
                 "connected":  connected == 1,
+				"pairing":    pairing == 1,
 				"loggedIn":   loggedIn,
                 "expiration": expiration,
                 "events":     events,
