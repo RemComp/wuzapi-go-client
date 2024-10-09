@@ -41,13 +41,14 @@ type MyClient struct {
 	eventHandlerID uint32
 	userID         int
 	token          string
+	name 		   string
 	subscriptions  []string
 	db             *sql.DB
 }
 
 // Connects to Whatsapp Websocket on server startup if last state was connected
 func (s *server) connectOnStartup() {
-	rows, err := s.db.Query("SELECT id,token,jid,webhook,events FROM users")
+	rows, err := s.db.Query("SELECT id,name,token,jid,webhook,events FROM users")
 	if err != nil {
 		log.Error().Err(err).Msg("DB Problem")
 		return
@@ -55,11 +56,12 @@ func (s *server) connectOnStartup() {
 	defer rows.Close()
 	for rows.Next() {
 		txtid := ""
+		name := ""
 		token := ""
 		jid := ""
 		webhook := ""
 		events := ""
-		err = rows.Scan(&txtid, &token, &jid, &webhook, &events)
+		err = rows.Scan(&txtid, &name, &token, &jid, &webhook, &events)
 		if err != nil {
 			log.Error().Err(err).Msg("DB Problem")
 			return
@@ -96,7 +98,7 @@ func (s *server) connectOnStartup() {
 			eventstring := strings.Join(subscribedEvents, ",")
 			log.Info().Str("events", eventstring).Str("jid",jid).Msg("Attempt to connect")
 			killchannel[userid] = make(chan bool)
-			go s.startClient(userid, jid, token, subscribedEvents)
+			go s.startClient(userid, name, jid, token, subscribedEvents)
 		}
 	}
 	err = rows.Err()
@@ -124,7 +126,7 @@ func parseJID(arg string) (types.JID, bool) {
 	}
 }
 
-func (s *server) startClient(userID int, textjid string, token string, subscriptions []string) {
+func (s *server) startClient(userID int, name string, textjid string, token string, subscriptions []string) {
 
 	log.Info().Str("userid", strconv.Itoa(userID)).Str("jid",textjid).Msg("Starting websocket connection to Whatsapp")
 
@@ -171,7 +173,7 @@ func (s *server) startClient(userID int, textjid string, token string, subscript
 		client = whatsmeow.NewClient(deviceStore, nil)
 	}
 	clientPointer[userID] = client
-	mycli := MyClient{client, 1, userID, token, subscriptions, s.db}
+	mycli := MyClient{client, 1, userID, token, name, subscriptions, s.db}
 	mycli.eventHandlerID = mycli.WAClient.AddEventHandler(mycli.myEventHandler)
 
 	//clientHttp[userID] = resty.New().EnableTrace()
@@ -523,6 +525,7 @@ func (mycli *MyClient) myEventHandler(rawEvt interface{}) {
 				data := map[string]string{
 					"jsonData":  string(values),
 					"token": mycli.token,
+					"name": mycli.name,
 				}
 				go callHook(webhookurl, data, mycli.userID)
 			} else {
@@ -530,6 +533,7 @@ func (mycli *MyClient) myEventHandler(rawEvt interface{}) {
 					"jsonData":  string(values),
 					"base64": stringBase64Media,
 					"token": mycli.token,
+					"name": mycli.name,
 				}
 				go callHook(webhookurl, data, mycli.userID)
 			}

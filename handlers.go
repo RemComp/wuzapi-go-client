@@ -52,6 +52,7 @@ func (s *server) authalice(next http.Handler) http.Handler {
 		var ctx context.Context
 		userid := 0
 		txtid := ""
+		name := ""
 		webhook := ""
 		jid := ""
 		events := ""
@@ -66,14 +67,14 @@ func (s *server) authalice(next http.Handler) http.Handler {
 		if !found {
 			log.Info().Msg("Looking for user information in DB")
 			// Checks DB from matching user and store user values in context
-			rows, err := s.db.Query("SELECT id,webhook,jid,events FROM users WHERE token=? LIMIT 1", token)
+			rows, err := s.db.Query("SELECT id,name,webhook,jid,events FROM users WHERE token=? LIMIT 1", token)
 			if err != nil {
 				s.Respond(w, r, http.StatusInternalServerError, err)
 				return
 			}
 			defer rows.Close()
 			for rows.Next() {
-				err = rows.Scan(&txtid, &webhook, &jid, &events)
+				err = rows.Scan(&txtid, &name, &webhook, &jid, &events)
 				if err != nil {
 					s.Respond(w, r, http.StatusInternalServerError, err)
 					return
@@ -81,6 +82,7 @@ func (s *server) authalice(next http.Handler) http.Handler {
 				userid, _ = strconv.Atoi(txtid)
 				v := Values{map[string]string{
 					"Id":      txtid,
+					"Name":    name,
 					"Jid":     jid,
 					"Webhook": webhook,
 					"Token":   token,
@@ -110,6 +112,7 @@ func (s *server) auth(handler http.HandlerFunc) http.HandlerFunc {
 		var ctx context.Context
 		userid := 0
 		txtid := ""
+		name := ""
 		webhook := ""
 		jid := ""
 		events := ""
@@ -124,14 +127,14 @@ func (s *server) auth(handler http.HandlerFunc) http.HandlerFunc {
 		if !found {
 			log.Info().Msg("Looking for user information in DB")
 			// Checks DB from matching user and store user values in context
-			rows, err := s.db.Query("SELECT id,webhook,jid,events FROM users WHERE token=? LIMIT 1", token)
+			rows, err := s.db.Query("SELECT id,name,webhook,jid,events FROM users WHERE token=? LIMIT 1", token)
 			if err != nil {
 				s.Respond(w, r, http.StatusInternalServerError, err)
 				return
 			}
 			defer rows.Close()
 			for rows.Next() {
-				err = rows.Scan(&txtid, &webhook, &jid, &events)
+				err = rows.Scan(&txtid, &name, &webhook, &jid, &events)
 				if err != nil {
 					s.Respond(w, r, http.StatusInternalServerError, err)
 					return
@@ -139,6 +142,7 @@ func (s *server) auth(handler http.HandlerFunc) http.HandlerFunc {
 				userid, _ = strconv.Atoi(txtid)
 				v := Values{map[string]string{
 					"Id":      txtid,
+					"Name":    name,
 					"Jid":     jid,
 					"Webhook": webhook,
 					"Token":   token,
@@ -174,6 +178,7 @@ func (s *server) Connect() http.HandlerFunc {
 		webhook := r.Context().Value("userinfo").(Values).Get("Webhook")
 		jid := r.Context().Value("userinfo").(Values).Get("Jid")
 		txtid := r.Context().Value("userinfo").(Values).Get("Id")
+		name := r.Context().Value("userinfo").(Values).Get("Name")
 		token := r.Context().Value("userinfo").(Values).Get("Token")
 		userid, _ := strconv.Atoi(txtid)
 		eventstring := ""
@@ -220,7 +225,7 @@ func (s *server) Connect() http.HandlerFunc {
 
 			log.Info().Str("jid", jid).Msg("Attempt to connect")
 			killchannel[userid] = make(chan bool)
-			go s.startClient(userid, jid, token, subscribedEvents)
+			go s.startClient(userid, name, jid, token, subscribedEvents)
 
 			if t.Immediate == false {
 				log.Warn().Msg("Waiting 10 seconds")
