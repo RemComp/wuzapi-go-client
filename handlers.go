@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"path/filepath"
 	"net/http"
 	"os"
 	"strconv"
@@ -2397,20 +2396,9 @@ func (s *server) DownloadImage() http.HandlerFunc {
 			return
 		}
 
-		// check/creates user directory for files
-		userDirectory := filepath.Join(s.exPath, "files", "user_"+txtid)
-		_, err := os.Stat(userDirectory)
-		if os.IsNotExist(err) {
-			errDir := os.MkdirAll(userDirectory, 0751)
-			if errDir != nil {
-				s.Respond(w, r, http.StatusInternalServerError, errors.New(fmt.Sprintf("Could not create user directory (%s)", userDirectory)))
-				return
-			}
-		}
-
 		decoder := json.NewDecoder(r.Body)
 		var t downloadImageStruct
-		err = decoder.Decode(&t)
+		err := decoder.Decode(&t)
 		if err != nil {
 			s.Respond(w, r, http.StatusBadRequest, errors.New("Could not decode Payload"))
 			return
@@ -2477,20 +2465,9 @@ func (s *server) DownloadDocument() http.HandlerFunc {
 			return
 		}
 
-		// check/creates user directory for files
-		userDirectory := filepath.Join(s.exPath, "files", "user_"+txtid)
-		_, err := os.Stat(userDirectory)
-		if os.IsNotExist(err) {
-			errDir := os.MkdirAll(userDirectory, 0751)
-			if errDir != nil {
-				s.Respond(w, r, http.StatusInternalServerError, errors.New(fmt.Sprintf("Could not create user directory (%s)", userDirectory)))
-				return
-			}
-		}
-
 		decoder := json.NewDecoder(r.Body)
 		var t downloadDocumentStruct
-		err = decoder.Decode(&t)
+		err := decoder.Decode(&t)
 		if err != nil {
 			s.Respond(w, r, http.StatusBadRequest, errors.New("Could not decode Payload"))
 			return
@@ -2557,20 +2534,9 @@ func (s *server) DownloadVideo() http.HandlerFunc {
 			return
 		}
 
-		// check/creates user directory for files
-		userDirectory := filepath.Join(s.exPath, "files", "user_"+txtid)
-		_, err := os.Stat(userDirectory)
-		if os.IsNotExist(err) {
-			errDir := os.MkdirAll(userDirectory, 0751)
-			if errDir != nil {
-				s.Respond(w, r, http.StatusInternalServerError, errors.New(fmt.Sprintf("Could not create user directory (%s)", userDirectory)))
-				return
-			}
-		}
-
 		decoder := json.NewDecoder(r.Body)
 		var t downloadVideoStruct
-		err = decoder.Decode(&t)
+		err := decoder.Decode(&t)
 		if err != nil {
 			s.Respond(w, r, http.StatusBadRequest, errors.New("Could not decode Payload"))
 			return
@@ -2637,20 +2603,9 @@ func (s *server) DownloadAudio() http.HandlerFunc {
 			return
 		}
 
-		// check/creates user directory for files
-		userDirectory := filepath.Join(s.exPath, "files", "user_"+txtid)
-		_, err := os.Stat(userDirectory)
-		if os.IsNotExist(err) {
-			errDir := os.MkdirAll(userDirectory, 0751)
-			if errDir != nil {
-				s.Respond(w, r, http.StatusInternalServerError, errors.New(fmt.Sprintf("Could not create user directory (%s)", userDirectory)))
-				return
-			}
-		}
-
 		decoder := json.NewDecoder(r.Body)
 		var t downloadAudioStruct
-		err = decoder.Decode(&t)
+		err := decoder.Decode(&t)
 		if err != nil {
 			s.Respond(w, r, http.StatusBadRequest, errors.New("Could not decode Payload"))
 			return
