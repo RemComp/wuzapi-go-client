@@ -18,6 +18,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/patrickmn/go-cache"
 	"github.com/rs/zerolog"
+	"io/ioutil"
 	_ "modernc.org/sqlite"
 )
 
@@ -31,7 +32,7 @@ var (
 	address     = flag.String("address", "0.0.0.0", "Bind IP Address")
 	port        = flag.String("port", "8080", "Listen Port")
 	waDebug     = flag.String("wadebug", "", "Enable whatsmeow debug (INFO or DEBUG)")
-	logType     = flag.String("logtype", "console", "Type of log output (console or json)")
+	logType     = flag.String("logtype", "console", "Type of log output (console or json or off)")
 	colorOutput = flag.Bool("color", false, "Enable colored output for console logs")
 	sslcert     = flag.String("sslcertificate", "", "SSL Certificate File")
 	sslprivkey  = flag.String("sslprivatekey", "", "SSL Certificate Private Key File")
@@ -49,10 +50,12 @@ func init() {
 
 	if(*logType=="json") {
         log = zerolog.New(os.Stdout).With().Timestamp().Str("role",filepath.Base(os.Args[0])).Logger()
-    } else {
+	} else if(*logType=="off") {
+		log = zerolog.New(ioutil.Discard).With().Timestamp().Str("role",filepath.Base(os.Args[0])).Logger()
+	} else {
 		output := zerolog.ConsoleWriter{Out: os.Stdout, TimeFormat: time.RFC3339, NoColor: !*colorOutput}
         log = zerolog.New(output).With().Timestamp().Str("role",filepath.Base(os.Args[0])).Logger()
-    }
+	}
 
     if(*adminToken == "") {
         if v := os.Getenv("WUZAPI_ADMIN_TOKEN"); v != "" {

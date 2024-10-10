@@ -32,7 +32,6 @@ import (
 //var wlog waLog.Logger
 var clientPointer = make(map[int]*whatsmeow.Client)
 var clientHttp = make(map[int]*resty.Client)
-var historySyncID int32
 
 type MyClient struct {
 	WAClient       *whatsmeow.Client
