@@ -8,10 +8,8 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"path/filepath"
 	"strconv"
 	"strings"
-	"sync/atomic"
 	"time"
 	"crypto/tls"
 
@@ -283,12 +281,6 @@ func (mycli *MyClient) myEventHandler(rawEvt interface{}) {
 	// path := ""
 	stringBase64Media := ""
 
-	ex, err := os.Executable()
-	if err != nil {
-		panic(err)
-	}
-	exPath := filepath.Dir(ex)
-
 	switch evt := rawEvt.(type) {
 	case *events.AppStateSyncComplete:
 		if len(mycli.WAClient.Store.PushName) > 0 && evt.Name == appstate.WAPatchCriticalBlock {
@@ -443,37 +435,6 @@ func (mycli *MyClient) myEventHandler(rawEvt interface{}) {
 			postmap["state"] = "online"
 			log.Info().Str("from",evt.From.String()).Msg("User is now online")
 		}
-	case *events.HistorySync:
-		postmap["type"] = "HistorySync"
-		dowebhook = 1
-
-		// check/creates user directory for files
-		userDirectory := filepath.Join(exPath, "files", "user_"+txtid)
-		_, err := os.Stat(userDirectory)
-		if os.IsNotExist(err) {
-			errDir := os.MkdirAll(userDirectory, 0751)
-			if errDir != nil {
-				log.Error().Err(errDir).Msg("Could not create user directory")
-				return
-			}
-		}
-
-		id := atomic.AddInt32(&historySyncID, 1)
-		fileName := filepath.Join(userDirectory, "history-"+strconv.Itoa(int(id))+".json")
-		file, err := os.OpenFile(fileName, os.O_WRONLY|os.O_CREATE, 0600)
-		if err != nil {
-			log.Error().Err(err).Msg("Failed to open file to write history sync")
-			return
-		}
-		enc := json.NewEncoder(file)
-		enc.SetIndent("", "  ")
-		err = enc.Encode(evt.Data)
-		if err != nil {
-			log.Error().Err(err).Msg("Failed to write history sync")
-			return
-		}
-		log.Info().Str("filename",fileName).Msg("Wrote history sync")
-		_ = file.Close()
 	case *events.AppState:
 		log.Info().Str("index",fmt.Sprintf("%+v",evt.Index)).Str("actionValue",fmt.Sprintf("%+v",evt.SyncActionValue)).Msg("App state event received")
 	case *events.LoggedOut:
