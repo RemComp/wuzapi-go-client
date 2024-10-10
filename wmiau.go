@@ -207,7 +207,7 @@ func (s *server) startClient(userID int, name string, textjid string, token stri
 			for evt := range qrChan {
 				if evt.Event == "code" {
 					// Display QR code in terminal (useful for testing/developing)
-					if(*logType!="json") {
+					if(*logType!="json" && *logType!="off") {
 						qrterminal.GenerateHalfBlock(evt.Code, qrterminal.L, os.Stdout)
 						fmt.Println("QR code:\n", evt.Code)
 					}
