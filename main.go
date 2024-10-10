@@ -31,6 +31,7 @@ type server struct {
 var (
 	address     = flag.String("address", "0.0.0.0", "Bind IP Address")
 	port        = flag.String("port", "8080", "Listen Port")
+	dbAddress   = flag.String("dbaddress", "", "Database Address")
 	waDebug     = flag.String("wadebug", "", "Enable whatsmeow debug (INFO or DEBUG)")
 	logType     = flag.String("logtype", "console", "Type of log output (console or json or off)")
 	colorOutput = flag.Bool("color", false, "Enable colored output for console logs")
@@ -101,7 +102,8 @@ func main() {
 		dbLog := waLog.Stdout("Database", *waDebug, *colorOutput)
         container, err = sqlstore.New("sqlite3", "file:"+exPath+"/dbdata/main.db?_pragma=foreign_keys(1)&_busy_timeout=3000", dbLog)
 	} else {
-        container, err = sqlstore.New("sqlite3", "file:"+exPath+"/dbdata/main.db?_pragma=foreign_keys(1)&_busy_timeout=3000", nil)
+		// use postgres with user and password and database
+		container, err = sqlstore.New("postgres", *dbAddress, nil)
 	}
 	if err != nil {
 		panic(err)
