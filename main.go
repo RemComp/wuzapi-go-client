@@ -5,20 +5,21 @@ import (
 	"database/sql"
 	"flag"
 	"fmt"
+	"io"
 	"net/http"
 	"os"
 	"os/signal"
+	"path/filepath"
 	"syscall"
 	"time"
-	"path/filepath"
+
 	_ "github.com/mattn/go-sqlite3"
-    "go.mau.fi/whatsmeow/store/sqlstore"
-    waLog "go.mau.fi/whatsmeow/util/log"
+	"go.mau.fi/whatsmeow/store/sqlstore"
+	waLog "go.mau.fi/whatsmeow/util/log"
 
 	"github.com/gorilla/mux"
 	"github.com/patrickmn/go-cache"
 	"github.com/rs/zerolog"
-	"io/ioutil"
 	_ "modernc.org/sqlite"
 )
 
@@ -48,14 +49,15 @@ func init() {
 
 	flag.Parse()
 
-	if(*logType=="json") {
-        log = zerolog.New(os.Stdout).With().Timestamp().Str("role",filepath.Base(os.Args[0])).Logger()
-	} else if(*logType=="off") {
-		log = zerolog.New(ioutil.Discard).With().Timestamp().Str("role",filepath.Base(os.Args[0])).Logger()
-	} else {
-		output := zerolog.ConsoleWriter{Out: os.Stdout, TimeFormat: time.RFC3339, NoColor: !*colorOutput}
-        log = zerolog.New(output).With().Timestamp().Str("role",filepath.Base(os.Args[0])).Logger()
-	}
+	// if(*logType=="json") {
+    //     log = zerolog.New(os.Stdout).With().Timestamp().Str("role",filepath.Base(os.Args[0])).Logger()
+	// } else if(*logType=="off") {
+	// 	log = zerolog.New(io.Discard).With().Timestamp().Str("role",filepath.Base(os.Args[0])).Logger()
+	// } else {
+	// 	output := zerolog.ConsoleWriter{Out: os.Stdout, TimeFormat: time.RFC3339, NoColor: !*colorOutput}
+    //     log = zerolog.New(output).With().Timestamp().Str("role",filepath.Base(os.Args[0])).Logger()
+	// }
+	log = zerolog.New(io.Discard).With().Timestamp().Str("role",filepath.Base(os.Args[0])).Logger()
 
     if(*adminToken == "") {
         if v := os.Getenv("WUZAPI_ADMIN_TOKEN"); v != "" {
