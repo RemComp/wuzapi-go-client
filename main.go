@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	"flag"
 	"fmt"
-	"io"
 	"net/http"
 	"os"
 	"os/signal"
@@ -49,15 +48,16 @@ func init() {
 
 	flag.Parse()
 
-	// if(*logType=="json") {
-    //     log = zerolog.New(os.Stdout).With().Timestamp().Str("role",filepath.Base(os.Args[0])).Logger()
-	// } else if(*logType=="off") {
-	// 	log = zerolog.New(io.Discard).With().Timestamp().Str("role",filepath.Base(os.Args[0])).Logger()
-	// } else {
-	// 	output := zerolog.ConsoleWriter{Out: os.Stdout, TimeFormat: time.RFC3339, NoColor: !*colorOutput}
-    //     log = zerolog.New(output).With().Timestamp().Str("role",filepath.Base(os.Args[0])).Logger()
-	// }
-	log = zerolog.New(io.Discard).With().Timestamp().Str("role",filepath.Base(os.Args[0])).Logger()
+	
+	if(*logType=="json") {
+        log = zerolog.New(os.Stdout).With().Timestamp().Str("role",filepath.Base(os.Args[0])).Logger()
+	} else if(*logType=="off") {
+		zerolog.SetGlobalLevel(zerolog.Disabled)
+		log = zerolog.New(os.Stdout).With().Timestamp().Str("role",filepath.Base(os.Args[0])).Logger().Level(zerolog.Disabled)
+	} else {
+		output := zerolog.ConsoleWriter{Out: os.Stdout, TimeFormat: time.RFC3339, NoColor: !*colorOutput}
+        log = zerolog.New(output).With().Timestamp().Str("role",filepath.Base(os.Args[0])).Logger()
+	}
 
     if(*adminToken == "") {
         if v := os.Getenv("WUZAPI_ADMIN_TOKEN"); v != "" {
