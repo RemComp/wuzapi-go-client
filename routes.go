@@ -1,24 +1,25 @@
 package main
 
 import (
-	"github.com/justinas/alice"
-	"github.com/rs/zerolog"
-	"github.com/rs/zerolog/hlog"
 	"net/http"
 	"os"
 	"path/filepath"
 	"time"
+
+	"github.com/justinas/alice"
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/hlog"
 )
 
 type Middleware = alice.Constructor
 
 func (s *server) routes() {
 
-    ex, err := os.Executable()
-    if err != nil {
-        panic(err)
-    }
-    exPath := filepath.Dir(ex)
+	ex, err := os.Executable()
+	if err != nil {
+		panic(err)
+	}
+	exPath := filepath.Dir(ex)
 
 	if *logType == "json" {
 		log = zerolog.New(os.Stdout).With().Timestamp().Str("role", filepath.Base(os.Args[0])).Str("host", *address).Logger()
@@ -27,11 +28,11 @@ func (s *server) routes() {
 		log = zerolog.New(output).With().Timestamp().Str("role", filepath.Base(os.Args[0])).Str("host", *address).Logger()
 	}
 
-    adminRoutes := s.router.PathPrefix("/admin").Subrouter()
-    adminRoutes.Use(s.authadmin)
-    adminRoutes.Handle("/users", s.ListUsers()).Methods("GET")
-    adminRoutes.Handle("/users", s.AddUser()).Methods("POST")
-    adminRoutes.Handle("/users/{id}", s.DeleteUser()).Methods("DELETE")
+	adminRoutes := s.router.PathPrefix("/admin").Subrouter()
+	adminRoutes.Use(s.authadmin)
+	adminRoutes.Handle("/users", s.ListUsers()).Methods("GET")
+	adminRoutes.Handle("/users", s.AddUser()).Methods("POST")
+	adminRoutes.Handle("/users/{id}", s.DeleteUser()).Methods("DELETE")
 
 	c := alice.New()
 	c = c.Append(s.authalice)
@@ -64,18 +65,19 @@ func (s *server) routes() {
 
 	s.router.Handle("/chat/send/text", c.Then(s.SendMessage())).Methods("POST")
 	s.router.Handle("/chat/send/edit", c.Then(s.SendEditMessage())).Methods("POST")
+	s.router.Handle("/chat/send/event", c.Then(s.SendEventMessage())).Methods("POST")
 	s.router.Handle("/chat/send/delete", c.Then(s.SendDeleteMessage())).Methods("POST")
 	s.router.Handle("/chat/send/image", c.Then(s.SendImage())).Methods("POST")
 	s.router.Handle("/chat/send/audio", c.Then(s.SendAudio())).Methods("POST")
 	s.router.Handle("/chat/send/document", c.Then(s.SendDocument())).Methods("POST")
-//	s.router.Handle("/chat/send/template", c.Then(s.SendTemplate())).Methods("POST")
+	//	s.router.Handle("/chat/send/template", c.Then(s.SendTemplate())).Methods("POST")
 	s.router.Handle("/chat/send/video", c.Then(s.SendVideo())).Methods("POST")
 	s.router.Handle("/chat/send/sticker", c.Then(s.SendSticker())).Methods("POST")
 	s.router.Handle("/chat/send/location", c.Then(s.SendLocation())).Methods("POST")
 	s.router.Handle("/chat/send/contact", c.Then(s.SendContact())).Methods("POST")
 	s.router.Handle("/chat/react", c.Then(s.React())).Methods("POST")
-	s.router.Handle("/chat/send/buttons",     c.Then(s.SendButtons())).Methods("POST")
-	s.router.Handle("/chat/send/list",     c.Then(s.SendList())).Methods("POST")
+	s.router.Handle("/chat/send/buttons", c.Then(s.SendButtons())).Methods("POST")
+	s.router.Handle("/chat/send/list", c.Then(s.SendList())).Methods("POST")
 
 	s.router.Handle("/user/info", c.Then(s.GetUser())).Methods("POST")
 	s.router.Handle("/user/check", c.Then(s.CheckUser())).Methods("POST")
@@ -101,5 +103,5 @@ func (s *server) routes() {
 	s.router.Handle("/group/join", c.Then(s.GroupJoin())).Methods("POST")
 	s.router.Handle("/group/leave", c.Then(s.GroupLeave())).Methods("POST")
 
-	s.router.PathPrefix("/").Handler(http.FileServer(http.Dir(exPath+"/static/")))
+	s.router.PathPrefix("/").Handler(http.FileServer(http.Dir(exPath + "/static/")))
 }

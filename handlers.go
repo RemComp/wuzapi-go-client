@@ -1,24 +1,25 @@
 package main
 
 import (
+	"bytes"
 	"context"
+	"database/sql"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"image"
+	"image/jpeg"
 	"net/http"
 	"os"
 	"strconv"
 	"strings"
 	"time"
-	"database/sql"
-	"image"
-	"image/jpeg"
-	"bytes"
 
-	"github.com/nfnt/resize"
 	"github.com/gorilla/mux"
+	"github.com/nfnt/resize"
 	"github.com/patrickmn/go-cache"
 	"github.com/vincent-petithory/dataurl"
+	"go.mau.fi/util/random"
 	"go.mau.fi/whatsmeow"
 	waProto "go.mau.fi/whatsmeow/binary/proto"
 	"go.mau.fi/whatsmeow/types"
@@ -36,14 +37,14 @@ func (v Values) Get(key string) string {
 var messageTypes = []string{"Message", "ReadReceipt", "Presence", "HistorySync", "ChatPresence", "GroupJoined", "GroupInfo", "PairSuccess", "All"}
 
 func (s *server) authadmin(next http.Handler) http.Handler {
-    return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-        token := r.Header.Get("Authorization")
-        if token != *adminToken {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		token := r.Header.Get("Authorization")
+		if token != *adminToken {
 			s.Respond(w, r, http.StatusUnauthorized, errors.New("Unauthorized"))
-            return
-        }
-        next.ServeHTTP(w, r)
-    })
+			return
+		}
+		next.ServeHTTP(w, r)
+	})
 }
 
 func (s *server) authalice(next http.Handler) http.Handler {
@@ -482,7 +483,7 @@ func (s *server) Logout() http.HandlerFunc {
 func (s *server) PairPhone() http.HandlerFunc {
 
 	type pairStruct struct {
-		Phone       string
+		Phone string
 	}
 
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -509,7 +510,7 @@ func (s *server) PairPhone() http.HandlerFunc {
 		}
 
 		isLoggedIn := clientPointer[userid].IsLoggedIn()
-		if(isLoggedIn) {
+		if isLoggedIn {
 			log.Error().Msg(fmt.Sprintf("%s", "Already paired"))
 			s.Respond(w, r, http.StatusBadRequest, errors.New("Already paired"))
 			return
@@ -532,7 +533,6 @@ func (s *server) PairPhone() http.HandlerFunc {
 		return
 	}
 }
-
 
 // Gets Connected and LoggedIn Status
 func (s *server) GetStatus() http.HandlerFunc {
@@ -662,8 +662,8 @@ func (s *server) SendDocument() http.HandlerFunc {
 				QuotedMessage: &waProto.Message{Conversation: proto.String("")},
 			}
 		}
-		if(t.ContextInfo.MentionedJID != nil) {
-			if(msg.DocumentMessage.ContextInfo == nil) {
+		if t.ContextInfo.MentionedJID != nil {
+			if msg.DocumentMessage.ContextInfo == nil {
 				msg.DocumentMessage.ContextInfo = &waProto.ContextInfo{}
 			}
 			msg.DocumentMessage.ContextInfo.MentionedJID = t.ContextInfo.MentionedJID
@@ -695,7 +695,7 @@ func (s *server) SendAudio() http.HandlerFunc {
 		Audio       string
 		Caption     string
 		Id          string
-		Seconds	 	*int
+		Seconds     *int
 		ContextInfo waProto.ContextInfo
 	}
 
@@ -780,20 +780,20 @@ func (s *server) SendAudio() http.HandlerFunc {
 		// 	}
 		// }
 
-        ptt := true
-        mime := "audio/ogg; codecs=opus"
+		ptt := true
+		mime := "audio/ogg; codecs=opus"
 
 		msg := &waProto.Message{AudioMessage: &waProto.AudioMessage{
-			URL:           proto.String(uploaded.URL),
-			DirectPath:    proto.String(uploaded.DirectPath),
-			MediaKey:      uploaded.MediaKey,
-            // Mimetype:      proto.String(http.DetectContentType(filedata)),
+			URL:        proto.String(uploaded.URL),
+			DirectPath: proto.String(uploaded.DirectPath),
+			MediaKey:   uploaded.MediaKey,
+			// Mimetype:      proto.String(http.DetectContentType(filedata)),
 			Mimetype:      &mime,
 			FileEncSHA256: uploaded.FileEncSHA256,
 			FileSHA256:    uploaded.FileSHA256,
 			FileLength:    proto.Uint64(uint64(len(filedata))),
-            PTT:           &ptt,
-			Seconds: 	   proto.Uint32(uint32(SecondsAudio)),
+			PTT:           &ptt,
+			Seconds:       proto.Uint32(uint32(SecondsAudio)),
 		}}
 
 		if t.ContextInfo.StanzaID != nil {
@@ -803,8 +803,8 @@ func (s *server) SendAudio() http.HandlerFunc {
 				QuotedMessage: &waProto.Message{Conversation: proto.String("")},
 			}
 		}
-		if(t.ContextInfo.MentionedJID != nil) {
-			if(msg.AudioMessage.ContextInfo == nil) {
+		if t.ContextInfo.MentionedJID != nil {
+			if msg.AudioMessage.ContextInfo == nil {
 				msg.ExtendedTextMessage.ContextInfo = &waProto.ContextInfo{}
 			}
 			msg.AudioMessage.ContextInfo.MentionedJID = t.ContextInfo.MentionedJID
@@ -930,7 +930,6 @@ func (s *server) SendImage() http.HandlerFunc {
 				return
 			}
 
-
 		} else {
 			s.Respond(w, r, http.StatusBadRequest, errors.New("Image data should start with \"data:image/png;base64,\""))
 			return
@@ -955,8 +954,8 @@ func (s *server) SendImage() http.HandlerFunc {
 				QuotedMessage: &waProto.Message{Conversation: proto.String("")},
 			}
 		}
-		if(t.ContextInfo.MentionedJID != nil) {
-			if(msg.ImageMessage.ContextInfo == nil) {
+		if t.ContextInfo.MentionedJID != nil {
+			if msg.ImageMessage.ContextInfo == nil {
 				msg.ImageMessage.ContextInfo = &waProto.ContextInfo{}
 			}
 			msg.ImageMessage.ContextInfo.MentionedJID = t.ContextInfo.MentionedJID
@@ -1073,8 +1072,8 @@ func (s *server) SendSticker() http.HandlerFunc {
 				QuotedMessage: &waProto.Message{Conversation: proto.String("")},
 			}
 		}
-		if(t.ContextInfo.MentionedJID != nil) {
-			if(msg.StickerMessage.ContextInfo == nil) {
+		if t.ContextInfo.MentionedJID != nil {
+			if msg.StickerMessage.ContextInfo == nil {
 				msg.StickerMessage.ContextInfo = &waProto.ContextInfo{}
 			}
 			msg.StickerMessage.ContextInfo.MentionedJID = t.ContextInfo.MentionedJID
@@ -1193,8 +1192,8 @@ func (s *server) SendVideo() http.HandlerFunc {
 				QuotedMessage: &waProto.Message{Conversation: proto.String("")},
 			}
 		}
-		if(t.ContextInfo.MentionedJID != nil) {
-			if(msg.VideoMessage.ContextInfo == nil) {
+		if t.ContextInfo.MentionedJID != nil {
+			if msg.VideoMessage.ContextInfo == nil {
 				msg.VideoMessage.ContextInfo = &waProto.ContextInfo{}
 			}
 			msg.VideoMessage.ContextInfo.MentionedJID = t.ContextInfo.MentionedJID
@@ -1287,8 +1286,8 @@ func (s *server) SendContact() http.HandlerFunc {
 				QuotedMessage: &waProto.Message{Conversation: proto.String("")},
 			}
 		}
-		if(t.ContextInfo.MentionedJID != nil) {
-			if(msg.ContactMessage.ContextInfo == nil) {
+		if t.ContextInfo.MentionedJID != nil {
+			if msg.ContactMessage.ContextInfo == nil {
 				msg.ContactMessage.ContextInfo = &waProto.ContextInfo{}
 			}
 			msg.ContactMessage.ContextInfo.MentionedJID = t.ContextInfo.MentionedJID
@@ -1383,8 +1382,8 @@ func (s *server) SendLocation() http.HandlerFunc {
 				QuotedMessage: &waProto.Message{Conversation: proto.String("")},
 			}
 		}
-		if(t.ContextInfo.MentionedJID != nil) {
-			if(msg.LocationMessage.ContextInfo == nil) {
+		if t.ContextInfo.MentionedJID != nil {
+			if msg.LocationMessage.ContextInfo == nil {
 				msg.LocationMessage.ContextInfo = &waProto.ContextInfo{}
 			}
 			msg.LocationMessage.ContextInfo.MentionedJID = t.ContextInfo.MentionedJID
@@ -1412,15 +1411,15 @@ func (s *server) SendLocation() http.HandlerFunc {
 
 func (s *server) SendButtons() http.HandlerFunc {
 
-    type buttonStruct struct {
-        ButtonId   string
-        ButtonText string
-    }
+	type buttonStruct struct {
+		ButtonId   string
+		ButtonText string
+	}
 	type textStruct struct {
-        Phone   string
-        Title   string
-        Buttons []buttonStruct
-        Id      string
+		Phone   string
+		Title   string
+		Buttons []buttonStruct
+		Id      string
 	}
 
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -1454,14 +1453,14 @@ func (s *server) SendButtons() http.HandlerFunc {
 			return
 		}
 
-        if len(t.Buttons) < 1 {
-            s.Respond(w, r, http.StatusBadRequest, errors.New("missing Buttons in Payload"))
-            return
-        }
-        if len(t.Buttons) > 3 {
-            s.Respond(w, r, http.StatusBadRequest, errors.New("buttons cant more than 3"))
-            return
-        }
+		if len(t.Buttons) < 1 {
+			s.Respond(w, r, http.StatusBadRequest, errors.New("missing Buttons in Payload"))
+			return
+		}
+		if len(t.Buttons) > 3 {
+			s.Respond(w, r, http.StatusBadRequest, errors.New("buttons cant more than 3"))
+			return
+		}
 
 		recipient, ok := parseJID(t.Phone)
 		if !ok {
@@ -1475,32 +1474,32 @@ func (s *server) SendButtons() http.HandlerFunc {
 			msgid = t.Id
 		}
 
-        var buttons []*waProto.ButtonsMessage_Button
+		var buttons []*waProto.ButtonsMessage_Button
 
-        for _, item := range t.Buttons {
-            buttons = append(buttons, &waProto.ButtonsMessage_Button{
-                ButtonID:       proto.String(item.ButtonId),
-                ButtonText:     &waProto.ButtonsMessage_Button_ButtonText{DisplayText: proto.String(item.ButtonText)},
-                Type:           waProto.ButtonsMessage_Button_RESPONSE.Enum(),
-                NativeFlowInfo: &waProto.ButtonsMessage_Button_NativeFlowInfo{},
-            })
-        }
+		for _, item := range t.Buttons {
+			buttons = append(buttons, &waProto.ButtonsMessage_Button{
+				ButtonID:       proto.String(item.ButtonId),
+				ButtonText:     &waProto.ButtonsMessage_Button_ButtonText{DisplayText: proto.String(item.ButtonText)},
+				Type:           waProto.ButtonsMessage_Button_RESPONSE.Enum(),
+				NativeFlowInfo: &waProto.ButtonsMessage_Button_NativeFlowInfo{},
+			})
+		}
 
-        msg2 := &waProto.ButtonsMessage{
-            ContentText: proto.String(t.Title),
-            HeaderType:  waProto.ButtonsMessage_EMPTY.Enum(),
-            Buttons:     buttons,
-        }
+		msg2 := &waProto.ButtonsMessage{
+			ContentText: proto.String(t.Title),
+			HeaderType:  waProto.ButtonsMessage_EMPTY.Enum(),
+			Buttons:     buttons,
+		}
 
 		resp, err = clientPointer[userid].SendMessage(context.Background(), recipient, &waProto.Message{ViewOnceMessage: &waProto.FutureProofMessage{
-            Message: &waProto.Message{
-                ButtonsMessage: msg2,
-            },
-        }}, whatsmeow.SendRequestExtra{ID: msgid})
-        if err != nil {
-            s.Respond(w, r, http.StatusInternalServerError, errors.New(fmt.Sprintf("Error sending message: %v", err)))
-            return
-        }
+			Message: &waProto.Message{
+				ButtonsMessage: msg2,
+			},
+		}}, whatsmeow.SendRequestExtra{ID: msgid})
+		if err != nil {
+			s.Respond(w, r, http.StatusInternalServerError, errors.New(fmt.Sprintf("Error sending message: %v", err)))
+			return
+		}
 
 		log.Info().Str("timestamp", fmt.Sprintf("%d", resp.Timestamp)).Str("id", msgid).Msg("Message sent")
 		response := map[string]interface{}{"Details": "Sent", "Timestamp": resp.Timestamp, "Id": msgid}
@@ -1518,141 +1517,141 @@ func (s *server) SendButtons() http.HandlerFunc {
 // https://github.com/tulir/whatsmeow/issues/305
 func (s *server) SendList() http.HandlerFunc {
 
-    type rowsStruct struct {
-        RowId       string
-        Title       string
-        Description string
-    }
+	type rowsStruct struct {
+		RowId       string
+		Title       string
+		Description string
+	}
 
-    type sectionsStruct struct {
-        Title string
-        Rows  []rowsStruct
-    }
+	type sectionsStruct struct {
+		Title string
+		Rows  []rowsStruct
+	}
 
-    type listStruct struct {
-        Phone       string
-        Title       string
-        Description string
-        ButtonText  string
-        FooterText  string
-        Sections    []sectionsStruct
-        Id          string
-    }
+	type listStruct struct {
+		Phone       string
+		Title       string
+		Description string
+		ButtonText  string
+		FooterText  string
+		Sections    []sectionsStruct
+		Id          string
+	}
 
-    return func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
 
-        txtid := r.Context().Value("userinfo").(Values).Get("Id")
-        userid, _ := strconv.Atoi(txtid)
+		txtid := r.Context().Value("userinfo").(Values).Get("Id")
+		userid, _ := strconv.Atoi(txtid)
 
-        if clientPointer[userid] == nil {
-            s.Respond(w, r, http.StatusInternalServerError, errors.New("no session"))
-            return
-        }
+		if clientPointer[userid] == nil {
+			s.Respond(w, r, http.StatusInternalServerError, errors.New("no session"))
+			return
+		}
 
-        msgid := ""
-        var resp whatsmeow.SendResponse
+		msgid := ""
+		var resp whatsmeow.SendResponse
 
-        decoder := json.NewDecoder(r.Body)
-        var t listStruct
-        err := decoder.Decode(&t)
-        marshal, _ := json.Marshal(t)
-        fmt.Println(string(marshal))
-        if err != nil {
-            fmt.Println(err)
-            s.Respond(w, r, http.StatusBadRequest, errors.New("could not decode Payload"))
-            return
-        }
+		decoder := json.NewDecoder(r.Body)
+		var t listStruct
+		err := decoder.Decode(&t)
+		marshal, _ := json.Marshal(t)
+		fmt.Println(string(marshal))
+		if err != nil {
+			fmt.Println(err)
+			s.Respond(w, r, http.StatusBadRequest, errors.New("could not decode Payload"))
+			return
+		}
 
-        if t.Phone == "" {
-            s.Respond(w, r, http.StatusBadRequest, errors.New("missing Phone in Payload"))
-            return
-        }
+		if t.Phone == "" {
+			s.Respond(w, r, http.StatusBadRequest, errors.New("missing Phone in Payload"))
+			return
+		}
 
-        if t.Title == "" {
-            s.Respond(w, r, http.StatusBadRequest, errors.New("missing Title in Payload"))
-            return
-        }
+		if t.Title == "" {
+			s.Respond(w, r, http.StatusBadRequest, errors.New("missing Title in Payload"))
+			return
+		}
 
-        if t.Description == "" {
-            s.Respond(w, r, http.StatusBadRequest, errors.New("missing Description in Payload"))
-            return
-        }
+		if t.Description == "" {
+			s.Respond(w, r, http.StatusBadRequest, errors.New("missing Description in Payload"))
+			return
+		}
 
-        if t.ButtonText == "" {
-            s.Respond(w, r, http.StatusBadRequest, errors.New("missing ButtonText in Payload"))
-            return
-        }
+		if t.ButtonText == "" {
+			s.Respond(w, r, http.StatusBadRequest, errors.New("missing ButtonText in Payload"))
+			return
+		}
 
-        if len(t.Sections) < 1 {
-            s.Respond(w, r, http.StatusBadRequest, errors.New("missing Sections in Payload"))
-            return
-        }
-        recipient, ok := parseJID(t.Phone)
-        if !ok {
-            s.Respond(w, r, http.StatusBadRequest, errors.New("could not parse Phone"))
-            return
-        }
+		if len(t.Sections) < 1 {
+			s.Respond(w, r, http.StatusBadRequest, errors.New("missing Sections in Payload"))
+			return
+		}
+		recipient, ok := parseJID(t.Phone)
+		if !ok {
+			s.Respond(w, r, http.StatusBadRequest, errors.New("could not parse Phone"))
+			return
+		}
 
-        if t.Id == "" {
-            msgid = whatsmeow.GenerateMessageID()
-        } else {
-            msgid = t.Id
-        }
+		if t.Id == "" {
+			msgid = whatsmeow.GenerateMessageID()
+		} else {
+			msgid = t.Id
+		}
 
-        var sections []*waProto.ListMessage_Section
+		var sections []*waProto.ListMessage_Section
 
-        for _, item := range t.Sections {
-            var rows []*waProto.ListMessage_Row
-            id := 1
-            for _, row := range item.Rows {
-                var idtext string
-                if row.RowId == "" {
-                    idtext = strconv.Itoa(id)
-                } else {
-                    idtext = row.RowId
-                }
-                rows = append(rows, &waProto.ListMessage_Row{
-                    RowID:       proto.String(idtext),
-                    Title:       proto.String(row.Title),
-                    Description: proto.String(row.Description),
-                })
-            }
+		for _, item := range t.Sections {
+			var rows []*waProto.ListMessage_Row
+			id := 1
+			for _, row := range item.Rows {
+				var idtext string
+				if row.RowId == "" {
+					idtext = strconv.Itoa(id)
+				} else {
+					idtext = row.RowId
+				}
+				rows = append(rows, &waProto.ListMessage_Row{
+					RowID:       proto.String(idtext),
+					Title:       proto.String(row.Title),
+					Description: proto.String(row.Description),
+				})
+			}
 
-            sections = append(sections, &waProto.ListMessage_Section{
-                Title: proto.String(item.Title),
-                Rows:  rows,
-            })
-        }
-        msg1 := &waProto.ListMessage{
-            Title:       proto.String(t.Title),
-            Description: proto.String(t.Description),
-            ButtonText:  proto.String(t.ButtonText),
-            ListType:    waProto.ListMessage_SINGLE_SELECT.Enum(),
-            Sections:    sections,
-            FooterText:  proto.String(t.FooterText),
-        }
+			sections = append(sections, &waProto.ListMessage_Section{
+				Title: proto.String(item.Title),
+				Rows:  rows,
+			})
+		}
+		msg1 := &waProto.ListMessage{
+			Title:       proto.String(t.Title),
+			Description: proto.String(t.Description),
+			ButtonText:  proto.String(t.ButtonText),
+			ListType:    waProto.ListMessage_SINGLE_SELECT.Enum(),
+			Sections:    sections,
+			FooterText:  proto.String(t.FooterText),
+		}
 
 		resp, err = clientPointer[userid].SendMessage(context.Background(), recipient, &waProto.Message{
-            ViewOnceMessage: &waProto.FutureProofMessage{
-                Message: &waProto.Message{
-                    ListMessage: msg1,
-                },
-            }}, whatsmeow.SendRequestExtra{ID: msgid})
-        if err != nil {
-            s.Respond(w, r, http.StatusInternalServerError, errors.New(fmt.Sprintf("Error sending message: %v", err)))
-            return
-        }
+			ViewOnceMessage: &waProto.FutureProofMessage{
+				Message: &waProto.Message{
+					ListMessage: msg1,
+				},
+			}}, whatsmeow.SendRequestExtra{ID: msgid})
+		if err != nil {
+			s.Respond(w, r, http.StatusInternalServerError, errors.New(fmt.Sprintf("Error sending message: %v", err)))
+			return
+		}
 
-        log.Info().Str("timestamp", fmt.Sprintf("%d", resp.Timestamp)).Str("id", msgid).Msg("Message sent")
+		log.Info().Str("timestamp", fmt.Sprintf("%d", resp.Timestamp)).Str("id", msgid).Msg("Message sent")
 		response := map[string]interface{}{"Details": "Sent", "Timestamp": resp.Timestamp, "Id": msgid}
 		responseJson, err := json.Marshal(response)
-        if err != nil {
-            s.Respond(w, r, http.StatusInternalServerError, err)
-        } else {
-            s.Respond(w, r, http.StatusOK, string(responseJson))
-        }
-        return
-    }
+		if err != nil {
+			s.Respond(w, r, http.StatusInternalServerError, err)
+		} else {
+			s.Respond(w, r, http.StatusOK, string(responseJson))
+		}
+		return
+	}
 }
 
 // Sends a regular text message
@@ -1724,8 +1723,8 @@ func (s *server) SendMessage() http.HandlerFunc {
 				QuotedMessage: &waProto.Message{Conversation: proto.String("")},
 			}
 		}
-		if(t.ContextInfo.MentionedJID != nil) {
-			if(msg.ExtendedTextMessage.ContextInfo == nil) {
+		if t.ContextInfo.MentionedJID != nil {
+			if msg.ExtendedTextMessage.ContextInfo == nil {
 				msg.ExtendedTextMessage.ContextInfo = &waProto.ContextInfo{}
 			}
 			msg.ExtendedTextMessage.ContextInfo.MentionedJID = t.ContextInfo.MentionedJID
@@ -1761,7 +1760,7 @@ func (s *server) SendEditMessage() http.HandlerFunc {
 	}
 
 	return func(w http.ResponseWriter, r *http.Request) {
-		
+
 		txtid := r.Context().Value("userinfo").(Values).Get("Id")
 		userid, _ := strconv.Atoi(txtid)
 
@@ -1818,8 +1817,8 @@ func (s *server) SendEditMessage() http.HandlerFunc {
 				QuotedMessage: &waProto.Message{Conversation: proto.String("")},
 			}
 		}
-		if(t.ContextInfo.MentionedJID != nil) {
-			if(msg.ExtendedTextMessage.ContextInfo == nil) {
+		if t.ContextInfo.MentionedJID != nil {
+			if msg.ExtendedTextMessage.ContextInfo == nil {
 				msg.ExtendedTextMessage.ContextInfo = &waProto.ContextInfo{}
 			}
 			msg.ExtendedTextMessage.ContextInfo.MentionedJID = t.ContextInfo.MentionedJID
@@ -1844,17 +1843,102 @@ func (s *server) SendEditMessage() http.HandlerFunc {
 	}
 }
 
+// send a event message
+func (s *server) SendEventMessage() http.HandlerFunc {
+	type eventStruct struct {
+		Phone     string
+		Id        string
+		Cancel    bool
+		NameEvent string
+		StartTime int64
+		Location  *waProto.LocationMessage
+	}
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		txtid := r.Context().Value("userinfo").(Values).Get("Id")
+		userid, _ := strconv.Atoi(txtid)
+
+		if clientPointer[userid] == nil {
+			s.Respond(w, r, http.StatusInternalServerError, errors.New("No session"))
+			return
+		}
+
+		msgid := ""
+		var resp whatsmeow.SendResponse
+
+		decoder := json.NewDecoder(r.Body)
+		var t eventStruct
+		err := decoder.Decode(&t)
+		if err != nil {
+			s.Respond(w, r, http.StatusBadRequest, errors.New("Could not decode Payload"))
+			return
+		}
+		if t.Phone == "" {
+			s.Respond(w, r, http.StatusBadRequest, errors.New("Missing Phone in Payload"))
+			return
+		}
+		if t.NameEvent == "" {
+			s.Respond(w, r, http.StatusBadRequest, errors.New("Missing NameEvent in Payload"))
+			return
+		}
+		if t.StartTime == 0 {
+			s.Respond(w, r, http.StatusBadRequest, errors.New("Missing StartTime in Payload"))
+			return
+		}
+
+		chat, ok := parseJID(t.Phone)
+		if !ok {
+			s.Respond(w, r, http.StatusBadRequest, errors.New("Could not parse Phone"))
+			return
+		}
+
+		if t.Id == "" {
+			msgid = whatsmeow.GenerateMessageID()
+		} else {
+			msgid = t.Id
+		}
+
+		var msg = &waProto.Message{
+			MessageContextInfo: &waProto.MessageContextInfo{
+				MessageSecret: random.Bytes(32),
+			},
+			EventMessage: &waProto.EventMessage{
+				IsCanceled: proto.Bool(t.Cancel),
+				Name:       proto.String(t.NameEvent),
+				StartTime:  proto.Int64(t.StartTime),
+				Location:   t.Location,
+			},
+		}
+
+		resp, err = clientPointer[userid].SendMessage(context.Background(), chat, msg, whatsmeow.SendRequestExtra{ID: msgid})
+		if err != nil {
+			s.Respond(w, r, http.StatusInternalServerError, errors.New(fmt.Sprintf("Error sending event message: %v", err)))
+			return
+		}
+
+		log.Info().Str("timestamp", fmt.Sprintf("%d", resp.Timestamp)).Str("id", msgid).Msg("Message event sent")
+		response := map[string]interface{}{"Details": "Sent", "Timestamp": resp.Timestamp, "Id": msgid}
+		responseJson, err := json.Marshal(response)
+		if err != nil {
+			s.Respond(w, r, http.StatusInternalServerError, err)
+		} else {
+			s.Respond(w, r, http.StatusOK, string(responseJson))
+		}
+		return
+	}
+}
+
 // Sends a delete message
 func (s *server) SendDeleteMessage() http.HandlerFunc {
 
 	type deleteStruct struct {
-		Chat 	 	string
-		Phone       string
-		Id          string
+		Chat  string
+		Phone string
+		Id    string
 	}
 
 	return func(w http.ResponseWriter, r *http.Request) {
-		
+
 		txtid := r.Context().Value("userinfo").(Values).Get("Id")
 		userid, _ := strconv.Atoi(txtid)
 
@@ -3207,7 +3291,7 @@ func (s *server) UpdateGroupParticipants() http.HandlerFunc {
 
 	type updateGroupParticipantsStruct struct {
 		GroupJID string
-		Phone []string
+		Phone    []string
 		// Action string // add, remove, promote, demote
 		Action string
 	}
@@ -3457,44 +3541,44 @@ func (s *server) GroupLeave() http.HandlerFunc {
 func (s *server) ListUsers() http.HandlerFunc {
 
 	type usersStruct struct {
-		Id int
-        Name string
-        Connected bool
-        Events string
+		Id        int
+		Name      string
+		Connected bool
+		Events    string
 	}
 
 	return func(w http.ResponseWriter, r *http.Request) {
 
-        // Query the database to get the list of users
-        rows, err := s.db.Query("SELECT id, name, token, webhook, jid, connected, pairing, expiration, events FROM users")
-        if err != nil {
+		// Query the database to get the list of users
+		rows, err := s.db.Query("SELECT id, name, token, webhook, jid, connected, pairing, expiration, events FROM users")
+		if err != nil {
 			s.Respond(w, r, http.StatusInternalServerError, errors.New("Problem accessing DB"))
-            return
-        }
-        defer rows.Close()
+			return
+		}
+		defer rows.Close()
 
-        // Create a slice to store the user data
-        users := []map[string]interface{}{}
+		// Create a slice to store the user data
+		users := []map[string]interface{}{}
 
-        // Iterate over the rows and populate the user data
-        for rows.Next() {
-            var id int
-            var name, token, webhook, jid string
-            var connectedNull sql.NullInt64
+		// Iterate over the rows and populate the user data
+		for rows.Next() {
+			var id int
+			var name, token, webhook, jid string
+			var connectedNull sql.NullInt64
 			var pairingNull sql.NullInt64
-            var expiration int
-            var events string
+			var expiration int
+			var events string
 
-            err := rows.Scan(&id, &name, &token, &webhook, &jid, &connectedNull, &pairingNull, &expiration, &events)
-            if err != nil {
-			    s.Respond(w, r, http.StatusInternalServerError, errors.New("Problem accessing DB"))
-                return
-            }
+			err := rows.Scan(&id, &name, &token, &webhook, &jid, &connectedNull, &pairingNull, &expiration, &events)
+			if err != nil {
+				s.Respond(w, r, http.StatusInternalServerError, errors.New("Problem accessing DB"))
+				return
+			}
 
-            connected := int(0)
-            if connectedNull.Valid {
-                connected = int(connectedNull.Int64)
-            }
+			connected := int(0)
+			if connectedNull.Valid {
+				connected = int(connectedNull.Int64)
+			}
 
 			pairing := int(0)
 			if pairingNull.Valid {
@@ -3506,55 +3590,55 @@ func (s *server) ListUsers() http.HandlerFunc {
 				loggedIn = clientPointer[id].IsLoggedIn()
 			}
 
-            user := map[string]interface{}{
-                "id":         id,
-                "name":       name,
-                "token":      token,
-                "webhook":    webhook,
-                "jid":        jid,
-                "connected":  connected == 1,
+			user := map[string]interface{}{
+				"id":         id,
+				"name":       name,
+				"token":      token,
+				"webhook":    webhook,
+				"jid":        jid,
+				"connected":  connected == 1,
 				"pairing":    pairing == 1,
 				"loggedIn":   loggedIn,
-                "expiration": expiration,
-                "events":     events,
-            }
+				"expiration": expiration,
+				"events":     events,
+			}
 
-            users = append(users, user)
-        }
-        // Check for any error that occurred during iteration
-        if err := rows.Err(); err != nil {
+			users = append(users, user)
+		}
+		// Check for any error that occurred during iteration
+		if err := rows.Err(); err != nil {
 			s.Respond(w, r, http.StatusInternalServerError, errors.New("Problem accessing DB"))
-            return
-        }
+			return
+		}
 
-        // Set the response content type to JSON
-        w.Header().Set("Content-Type", "application/json")
+		// Set the response content type to JSON
+		w.Header().Set("Content-Type", "application/json")
 
-        // Encode the user data as JSON and write the response
-        err = json.NewEncoder(w).Encode(users)
-        if err != nil {
+		// Encode the user data as JSON and write the response
+		err = json.NewEncoder(w).Encode(users)
+		if err != nil {
 			s.Respond(w, r, http.StatusInternalServerError, errors.New("Problem encodingJSON"))
-            return
-        }
-    }
+			return
+		}
+	}
 }
 
 func (s *server) AddUser() http.HandlerFunc {
-    return func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
 
-        // Parse the request body
-        var user struct {
-            Name       string `json:"name"`
-            Token      string `json:"token"`
-            Webhook    string `json:"webhook"`
-            Expiration int    `json:"expiration"`
-            Events     string `json:"events"`
-        }
-        err := json.NewDecoder(r.Body).Decode(&user)
-        if err != nil {
+		// Parse the request body
+		var user struct {
+			Name       string `json:"name"`
+			Token      string `json:"token"`
+			Webhook    string `json:"webhook"`
+			Expiration int    `json:"expiration"`
+			Events     string `json:"events"`
+		}
+		err := json.NewDecoder(r.Body).Decode(&user)
+		if err != nil {
 			s.Respond(w, r, http.StatusBadRequest, errors.New("Incomplete data in Payload. Required name,token,webhook,expiration,events"))
-            return
-        }
+			return
+		}
 
 		// Check if a user with the same token already exists
 		var count int
@@ -3579,48 +3663,48 @@ func (s *server) AddUser() http.HandlerFunc {
 			}
 		}
 
-        // Insert the user into the database
-        result, err := s.db.Exec("INSERT INTO users (name, token, webhook, expiration, events, jid, qrcode) VALUES (?, ?, ?, ?, ?, ?, ?)",
-            user.Name, user.Token, user.Webhook, user.Expiration, user.Events, "", "")
-        if err != nil {
+		// Insert the user into the database
+		result, err := s.db.Exec("INSERT INTO users (name, token, webhook, expiration, events, jid, qrcode) VALUES (?, ?, ?, ?, ?, ?, ?)",
+			user.Name, user.Token, user.Webhook, user.Expiration, user.Events, "", "")
+		if err != nil {
 			s.Respond(w, r, http.StatusInternalServerError, errors.New("Problem accessing DB"))
 			log.Error().Str("error", fmt.Sprintf("%v", err)).Msg("Admin DB Error")
-            return
-        }
+			return
+		}
 
-        // Get the ID of the inserted user
-        id, _ := result.LastInsertId()
+		// Get the ID of the inserted user
+		id, _ := result.LastInsertId()
 
-        // Return the inserted user ID
+		// Return the inserted user ID
 		response := map[string]interface{}{
-            "id": id,
-        }
-        json.NewEncoder(w).Encode(response)
-    }
+			"id": id,
+		}
+		json.NewEncoder(w).Encode(response)
+	}
 }
 
 func (s *server) DeleteUser() http.HandlerFunc {
-    return func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
 
-        // Get the user ID from the request URL
-        vars := mux.Vars(r)
-        userID := vars["id"]
+		// Get the user ID from the request URL
+		vars := mux.Vars(r)
+		userID := vars["id"]
 
-        // Delete the user from the database
-        result, err := s.db.Exec("DELETE FROM users WHERE id = ?", userID)
-        if err != nil {
+		// Delete the user from the database
+		result, err := s.db.Exec("DELETE FROM users WHERE id = ?", userID)
+		if err != nil {
 			s.Respond(w, r, http.StatusInternalServerError, errors.New("Problem accessing DB"))
-            return
-        }
+			return
+		}
 
-        // Check if the user was deleted
-        rowsAffected, _ := result.RowsAffected()
-        if rowsAffected == 0 {
+		// Check if the user was deleted
+		rowsAffected, _ := result.RowsAffected()
+		if rowsAffected == 0 {
 			s.Respond(w, r, http.StatusNotFound, errors.New("User not found"))
-            return
-        }
+			return
+		}
 
-        // Return a success response
+		// Return a success response
 		response := map[string]interface{}{"Details": "User deleted successfully"}
 		responseJson, err := json.Marshal(response)
 
@@ -3629,7 +3713,7 @@ func (s *server) DeleteUser() http.HandlerFunc {
 		} else {
 			s.Respond(w, r, http.StatusOK, string(responseJson))
 		}
-    }
+	}
 }
 
 // Writes JSON response to API clients
@@ -3680,10 +3764,10 @@ func validateMessageFields(phone string, stanzaid *string, participant *string) 
 }
 
 func contains(slice []string, item string) bool {
-    for _, value := range slice {
-        if value == item {
-            return true
-        }
-    }
-    return false
+	for _, value := range slice {
+		if value == item {
+			return true
+		}
+	}
+	return false
 }
