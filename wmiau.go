@@ -142,7 +142,7 @@ func (s *server) startClient(userID int, name string, textjid string, token stri
 		jid, _ := parseJID(textjid)
 		// If you want multiple sessions, remember their JIDs and use .GetDevice(jid) or .GetAllDevices() instead.
 		//deviceStore, err := container.GetFirstDevice()
-		deviceStore, err = container.GetDevice(jid)
+		deviceStore, err = container.GetDevice(context.Background(), jid)
 		if err != nil {
 			panic(err)
 		}

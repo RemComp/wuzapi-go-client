@@ -446,7 +446,7 @@ func (s *server) Logout() http.HandlerFunc {
 			return
 		} else {
 			if clientPointer[userid].IsLoggedIn() == true && clientPointer[userid].IsConnected() == true {
-				err := clientPointer[userid].Logout()
+				err := clientPointer[userid].Logout(context.Background())
 				if err != nil {
 					log.Error().Str("jid", jid).Msg("Could not perform logout")
 					s.Respond(w, r, http.StatusInternalServerError, errors.New("Could not perform logout"))
@@ -516,7 +516,7 @@ func (s *server) PairPhone() http.HandlerFunc {
 			return
 		}
 
-		linkingCode, err := clientPointer[userid].PairPhone(t.Phone, true, whatsmeow.PairClientChrome, "Chrome (Linux)")
+		linkingCode, err := clientPointer[userid].PairPhone(context.Background(), t.Phone, true, whatsmeow.PairClientChrome, "Chrome (Linux)")
 		if err != nil {
 			log.Error().Msg(fmt.Sprintf("%s", err))
 			s.Respond(w, r, http.StatusBadRequest, err)
@@ -2382,7 +2382,7 @@ func (s *server) GetContacts() http.HandlerFunc {
 		}
 
 		result := map[types.JID]types.ContactInfo{}
-		result, err := clientPointer[userid].Store.Contacts.GetAllContacts()
+		result, err := clientPointer[userid].Store.Contacts.GetAllContacts(context.Background())
 		if err != nil {
 			s.Respond(w, r, http.StatusInternalServerError, err)
 			return
@@ -2506,7 +2506,7 @@ func (s *server) DownloadImage() http.HandlerFunc {
 		img := msg.GetImageMessage()
 
 		if img != nil {
-			imgdata, err = clientPointer[userid].Download(img)
+			imgdata, err = clientPointer[userid].Download(context.Background(), img)
 			if err != nil {
 				log.Error().Str("error", fmt.Sprintf("%v", err)).Msg("Failed to download image")
 				msg := fmt.Sprintf("Failed to download image %v", err)
@@ -2575,7 +2575,7 @@ func (s *server) DownloadDocument() http.HandlerFunc {
 		doc := msg.GetDocumentMessage()
 
 		if doc != nil {
-			docdata, err = clientPointer[userid].Download(doc)
+			docdata, err = clientPointer[userid].Download(context.Background(), doc)
 			if err != nil {
 				log.Error().Str("error", fmt.Sprintf("%v", err)).Msg("Failed to download document")
 				msg := fmt.Sprintf("Failed to download document %v", err)
@@ -2644,7 +2644,7 @@ func (s *server) DownloadVideo() http.HandlerFunc {
 		doc := msg.GetVideoMessage()
 
 		if doc != nil {
-			docdata, err = clientPointer[userid].Download(doc)
+			docdata, err = clientPointer[userid].Download(context.Background(), doc)
 			if err != nil {
 				log.Error().Str("error", fmt.Sprintf("%v", err)).Msg("Failed to download video")
 				msg := fmt.Sprintf("Failed to download video %v", err)
@@ -2713,7 +2713,7 @@ func (s *server) DownloadAudio() http.HandlerFunc {
 		doc := msg.GetAudioMessage()
 
 		if doc != nil {
-			docdata, err = clientPointer[userid].Download(doc)
+			docdata, err = clientPointer[userid].Download(context.Background(), doc)
 			if err != nil {
 				log.Error().Str("error", fmt.Sprintf("%v", err)).Msg("Failed to download audio")
 				msg := fmt.Sprintf("Failed to download audio %v", err)
