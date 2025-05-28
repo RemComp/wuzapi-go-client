@@ -100,13 +100,69 @@ func main() {
 
 	if *waDebug != "" {
 		dbLog := waLog.Stdout("Database", *waDebug, *colorOutput)
-		container, err = sqlstore.New(context.Background(), "sqlite3", "file:"+exPath+"/dbdata/main.db?_pragma=foreign_keys(1)&_busy_timeout=3000", dbLog)
+
+		// Create the database connection first
+		db, err := sql.Open("sqlite3", "file:"+exPath+"/dbdata/main.db?_pragma=foreign_keys(1)&_busy_timeout=3000")
+		if err != nil {
+			log.Error().Err(err).Msg("Error opening main database")
+			panic(err)
+		}
+
+		// Explicitly enable foreign keys with a direct query
+		_, err = db.Exec("PRAGMA foreign_keys = ON;")
+		if err != nil {
+			log.Error().Err(err).Msg("Error enabling foreign keys for main database")
+			panic(err)
+		}
+
+		// Verify foreign keys are enabled
+		var enabled int
+		err = db.QueryRow("PRAGMA foreign_keys;").Scan(&enabled)
+		if err != nil {
+			log.Error().Err(err).Msg("Error checking foreign_keys status for main database")
+			panic(err)
+		}
+
+		if enabled != 1 {
+			log.Error().Msg("Foreign keys are not enabled for main database despite PRAGMA setting")
+			panic("Foreign keys not enabled")
+		}
+
+		container = sqlstore.NewWithDB(db, "sqlite3", dbLog)
 	} else {
-		// use postgres with user and password and database
-		// container, err = sqlstore.New("postgres", *dbAddress, nil)
-		container, err = sqlstore.New(context.Background(), "sqlite3", "file:"+exPath+"/dbdata/main.db?_pragma=foreign_keys(1)&_busy_timeout=3000", nil)
+		// Create the database connection first
+		db, err := sql.Open("sqlite3", "file:"+exPath+"/dbdata/main.db?_pragma=foreign_keys(1)&_busy_timeout=3000")
+		if err != nil {
+			log.Error().Err(err).Msg("Error opening main database")
+			panic(err)
+		}
+
+		// Explicitly enable foreign keys with a direct query
+		_, err = db.Exec("PRAGMA foreign_keys = ON;")
+		if err != nil {
+			log.Error().Err(err).Msg("Error enabling foreign keys for main database")
+			panic(err)
+		}
+
+		// Verify foreign keys are enabled
+		var enabled int
+		err = db.QueryRow("PRAGMA foreign_keys;").Scan(&enabled)
+		if err != nil {
+			log.Error().Err(err).Msg("Error checking foreign_keys status for main database")
+			panic(err)
+		}
+
+		if enabled != 1 {
+			log.Error().Msg("Foreign keys are not enabled for main database despite PRAGMA setting")
+			panic("Foreign keys not enabled")
+		}
+
+		container = sqlstore.NewWithDB(db, "sqlite3", nil)
 	}
+
+	err = container.Upgrade(context.Background())
 	if err != nil {
+		log.Error().Err(err).Msg("Error upgrading main container")
 		panic(err)
 	}
 
