@@ -550,8 +550,9 @@ func (s *server) GetStatus() http.HandlerFunc {
 		isConnected := clientPointer[userid].IsConnected()
 		isLoggedIn := clientPointer[userid].IsLoggedIn()
 		jid := r.Context().Value("userinfo").(Values).Get("Jid")
+		lid := clientPointer[userid].Store.LIDs
 
-		response := map[string]interface{}{"Connected": isConnected, "LoggedIn": isLoggedIn, "JID": jid}
+		response := map[string]interface{}{"Connected": isConnected, "LoggedIn": isLoggedIn, "JID": jid, "LID": lid}
 		responseJson, err := json.Marshal(response)
 		if err != nil {
 			s.Respond(w, r, http.StatusInternalServerError, err)
