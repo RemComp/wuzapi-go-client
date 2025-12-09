@@ -2207,7 +2207,7 @@ func (s *server) CheckUser() http.HandlerFunc {
 			return
 		}
 
-		resp, err := clientPointer[userid].IsOnWhatsApp(t.Phone)
+		resp, err := clientPointer[userid].IsOnWhatsApp(context.Background(), t.Phone)
 		if err != nil {
 			s.Respond(w, r, http.StatusInternalServerError, errors.New(fmt.Sprintf("Failed to check if users are on WhatsApp: %s", err)))
 			return
@@ -2275,7 +2275,7 @@ func (s *server) GetUser() http.HandlerFunc {
 			}
 			jids = append(jids, jid)
 		}
-		resp, err := clientPointer[userid].GetUserInfo(jids)
+		resp, err := clientPointer[userid].GetUserInfo(context.Background(), jids)
 
 		if err != nil {
 			msg := fmt.Sprintf("Failed to get user info: %v", err)
@@ -2341,7 +2341,7 @@ func (s *server) GetAvatar() http.HandlerFunc {
 		var pic *types.ProfilePictureInfo
 
 		existingID := ""
-		pic, err = clientPointer[userid].GetProfilePictureInfo(jid, &whatsmeow.GetProfilePictureParams{
+		pic, err = clientPointer[userid].GetProfilePictureInfo(context.Background(), jid, &whatsmeow.GetProfilePictureParams{
 			Preview:    t.Preview,
 			ExistingID: existingID,
 		})
@@ -2443,7 +2443,7 @@ func (s *server) ChatPresence() http.HandlerFunc {
 			return
 		}
 
-		err = clientPointer[userid].SendChatPresence(jid, types.ChatPresence(t.State), types.ChatPresenceMedia(t.Media))
+		err = clientPointer[userid].SendChatPresence(context.Background(), jid, types.ChatPresence(t.State), types.ChatPresenceMedia(t.Media))
 		if err != nil {
 			s.Respond(w, r, http.StatusInternalServerError, errors.New("Failure sending chat presence to Whatsapp servers"))
 			return
@@ -2869,7 +2869,11 @@ func (s *server) MarkRead() http.HandlerFunc {
 			return
 		}
 
-		err = clientPointer[userid].MarkRead(t.Id, time.Now(), t.Chat, t.Sender)
+		msgIDs := make([]types.MessageID, len(t.Id))
+		for i, id := range t.Id {
+			msgIDs[i] = types.MessageID(id)
+		}
+		err = clientPointer[userid].MarkRead(context.Background(), msgIDs, time.Now(), t.Chat, t.Sender)
 		if err != nil {
 			s.Respond(w, r, http.StatusInternalServerError, errors.New("Failure marking messages as read"))
 			return
@@ -2903,7 +2907,7 @@ func (s *server) ListGroups() http.HandlerFunc {
 			return
 		}
 
-		resp, err := clientPointer[userid].GetJoinedGroups()
+		resp, err := clientPointer[userid].GetJoinedGroups(context.Background())
 
 		if err != nil {
 			msg := fmt.Sprintf("Failed to get group list: %v", err)
@@ -2958,7 +2962,7 @@ func (s *server) GetGroupInfo() http.HandlerFunc {
 			return
 		}
 
-		resp, err := clientPointer[userid].GetGroupInfo(group)
+		resp, err := clientPointer[userid].GetGroupInfo(context.Background(), group)
 
 		if err != nil {
 			msg := fmt.Sprintf("Failed to get group info: %v", err)
@@ -3022,7 +3026,7 @@ func (s *server) GetGroupInviteLink() http.HandlerFunc {
 			return
 		}
 
-		resp, err := clientPointer[userid].GetGroupInviteLink(group, reset)
+		resp, err := clientPointer[userid].GetGroupInviteLink(context.Background(), group, reset)
 
 		if err != nil {
 			log.Error().Str("error", fmt.Sprintf("%v", err)).Msg("Failed to get group invite link")
@@ -3074,7 +3078,7 @@ func (s *server) GetGroupInviteInfo() http.HandlerFunc {
 			return
 		}
 
-		groupInfo, err := clientPointer[userid].GetGroupInfoFromLink(t.Code)
+		groupInfo, err := clientPointer[userid].GetGroupInfoFromLink(context.Background(), t.Code)
 
 		if err != nil {
 			log.Error().Str("error", fmt.Sprintf("%v", err)).Msg("Failed to get group invite info")
@@ -3147,7 +3151,7 @@ func (s *server) SetGroupPhoto() http.HandlerFunc {
 			return
 		}
 
-		picture_id, err := clientPointer[userid].SetGroupPhoto(group, filedata)
+		picture_id, err := clientPointer[userid].SetGroupPhoto(context.Background(), group, filedata)
 
 		if err != nil {
 			log.Error().Str("error", fmt.Sprintf("%v", err)).Msg("Failed to set group photo")
@@ -3206,7 +3210,7 @@ func (s *server) SetGroupName() http.HandlerFunc {
 			return
 		}
 
-		err = clientPointer[userid].SetGroupName(group, t.Name)
+		err = clientPointer[userid].SetGroupName(context.Background(), group, t.Name)
 
 		if err != nil {
 			log.Error().Str("error", fmt.Sprintf("%v", err)).Msg("Failed to set group name")
@@ -3265,7 +3269,7 @@ func (s *server) SetGroupTopic() http.HandlerFunc {
 			return
 		}
 
-		err = clientPointer[userid].SetGroupTopic(group, "", "", t.Topic)
+		err = clientPointer[userid].SetGroupTopic(context.Background(), group, "", "", t.Topic)
 
 		if err != nil {
 			log.Error().Str("error", fmt.Sprintf("%v", err)).Msg("Failed to set group topic")
@@ -3357,7 +3361,7 @@ func (s *server) UpdateGroupParticipants() http.HandlerFunc {
 			return
 		}
 
-		_, err = clientPointer[userid].UpdateGroupParticipants(group, phoneParsed, action)
+		_, err = clientPointer[userid].UpdateGroupParticipants(context.Background(), group, phoneParsed, action)
 
 		if err != nil {
 			log.Error().Str("error", fmt.Sprintf("%v", err)).Msg("Failed to change participant group")
@@ -3411,7 +3415,7 @@ func (s *server) SetGroupAnnounce() http.HandlerFunc {
 			return
 		}
 
-		err = clientPointer[userid].SetGroupAnnounce(group, t.Announce)
+		err = clientPointer[userid].SetGroupAnnounce(context.Background(), group, t.Announce)
 
 		if err != nil {
 			log.Error().Str("error", fmt.Sprintf("%v", err)).Msg("Failed to set group announce")
@@ -3463,7 +3467,7 @@ func (s *server) GroupJoin() http.HandlerFunc {
 			return
 		}
 
-		_, err = clientPointer[userid].JoinGroupWithLink(t.Code)
+		_, err = clientPointer[userid].JoinGroupWithLink(context.Background(), t.Code)
 
 		if err != nil {
 			log.Error().Str("error", fmt.Sprintf("%v", err)).Msg("Failed to join group")
@@ -3516,7 +3520,7 @@ func (s *server) GroupLeave() http.HandlerFunc {
 			return
 		}
 
-		err = clientPointer[userid].LeaveGroup(group)
+		err = clientPointer[userid].LeaveGroup(context.Background(), group)
 
 		if err != nil {
 			log.Error().Str("error", fmt.Sprintf("%v", err)).Msg("Failed to leave group")
