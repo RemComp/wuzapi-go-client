@@ -8,7 +8,9 @@ import (
 	"errors"
 	"fmt"
 	"image"
+	"image/gif"
 	"image/jpeg"
+	"image/png"
 	"net/http"
 	"os"
 	"strconv"
@@ -901,9 +903,9 @@ func (s *server) SendImage() http.HandlerFunc {
 				}
 			}
 
-			// decode jpeg into image.Image
+			// decode image and detect format
 			reader := bytes.NewReader(filedata)
-			img, _, err := image.Decode(reader)
+			img, format, err := image.Decode(reader)
 			if err != nil {
 				s.Respond(w, r, http.StatusInternalServerError, errors.New(fmt.Sprintf("Could not decode image for thumbnail preparation: %v", err)))
 				return
@@ -912,17 +914,44 @@ func (s *server) SendImage() http.HandlerFunc {
 			// resize to width 72 using Lanczos resampling and preserve aspect ratio
 			m := resize.Thumbnail(72, 72, img, resize.Lanczos3)
 
-			tmpFile, err := os.CreateTemp("", "resized-*.jpg")
+			// determine file extension based on format
+			fileExt := ".jpg"
+			if format == "png" {
+				fileExt = ".png"
+			} else if format == "gif" {
+				fileExt = ".gif"
+			}
+
+			tmpFile, err := os.CreateTemp("", "resized-*"+fileExt)
 			if err != nil {
 				s.Respond(w, r, http.StatusInternalServerError, errors.New(fmt.Sprintf("Could not create temp file for thumbnail: %v", err)))
 				return
 			}
 			defer tmpFile.Close()
 
-			// write new image to file
-			if err := jpeg.Encode(tmpFile, m, nil); err != nil {
-				s.Respond(w, r, http.StatusInternalServerError, errors.New(fmt.Sprintf("Failed to encode jpeg: %v", err)))
-				return
+			// encode image in the same format
+			switch format {
+			case "jpeg", "jpg":
+				if err := jpeg.Encode(tmpFile, m, nil); err != nil {
+					s.Respond(w, r, http.StatusInternalServerError, errors.New(fmt.Sprintf("Failed to encode jpeg: %v", err)))
+					return
+				}
+			case "png":
+				if err := png.Encode(tmpFile, m); err != nil {
+					s.Respond(w, r, http.StatusInternalServerError, errors.New(fmt.Sprintf("Failed to encode png: %v", err)))
+					return
+				}
+			case "gif":
+				if err := gif.Encode(tmpFile, m, nil); err != nil {
+					s.Respond(w, r, http.StatusInternalServerError, errors.New(fmt.Sprintf("Failed to encode gif: %v", err)))
+					return
+				}
+			default:
+				// default to jpeg for unknown formats
+				if err := jpeg.Encode(tmpFile, m, nil); err != nil {
+					s.Respond(w, r, http.StatusInternalServerError, errors.New(fmt.Sprintf("Failed to encode image: %v", err)))
+					return
+				}
 			}
 
 			thumbnailBytes, err = os.ReadFile(tmpFile.Name())
@@ -932,7 +961,7 @@ func (s *server) SendImage() http.HandlerFunc {
 			}
 
 		} else {
-			s.Respond(w, r, http.StatusBadRequest, errors.New("Image data should start with \"data:image/png;base64,\""))
+			s.Respond(w, r, http.StatusBadRequest, errors.New("Image data should start with \"data:image\""))
 			return
 		}
 
