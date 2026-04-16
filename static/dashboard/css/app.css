@@ -1,0 +1,1068 @@
+:root {
+  --primary-color: #00A884; /* WhatsApp's new brand green */
+  --secondary-color: #008069; /* WhatsApp's darker green */
+  --tertiary-color: #075E54; /* WhatsApp's darkest green */
+  --background-color: #f0f2f5;
+  --card-hover-color: #ffffff;
+  --text-color: #111B21; /* WhatsApp's text color */
+  --gradient-start: #00A884;
+  --gradient-end: #008069;
+  --message-background: #FFFFFF;
+  --success-green: #00A884;
+  --gradient-primary: linear-gradient(135deg, #25d366 0%, #128c7e 100%);
+}
+
+body {
+  background-color: var(--background-color) !important;
+  color: var(--text-color) !important;
+  font-family: "Helvetica Neue", "Helvetica Neue", Helvetica, Arial, sans-serif !important;
+}
+
+body > .ui.logingrid {
+  height: 100%;
+  max-width: 800px !important;
+  margin:auto !important;
+}
+
+#loginForm label {
+  color: var(--secondary-color);
+  font-weight: 600;
+  font-size: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.whatsapp.icon.bi-whatsapp {
+  font-size: 6rem;
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+.menu-header {
+  background: var(--primary-color) !important;
+  color: white !important;
+  margin-bottom: 2em !important;
+  box-shadow: 
+      0 20px 40px rgba(0, 168, 132, 0.2),
+      inset 0 0 80px rgba(255, 255, 255, 0.15) !important;
+  position: relative;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease-in-out;
+}
+
+.login {
+  border-radius: 15px !important;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1) !important;
+  padding: 2em !important;
+}
+
+.container {
+  max-width: 1400px !important;
+  margin: 0 auto !important;
+}
+
+.main-header {
+  background: var(--primary-color) !important;
+  color: white !important;
+  padding: 1.5em 2em !important;
+  border-radius: 24px !important;
+  margin-bottom: 2em !important;
+  box-shadow: 
+      0 20px 40px rgba(0, 168, 132, 0.2),
+      inset 0 0 80px rgba(255, 255, 255, 0.15) !important;
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease-in-out;
+}
+
+.hidden {
+  display:none !important;
+}
+
+.ui.stackable.cards > .card.hidden {
+  display: none !important;
+}
+
+.menu-header .title-container {
+  font-size: clamp(1.5em, 3vw, 1.8em) !important;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: white;
+}
+.main-header .title-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: white;
+}
+
+a#menulogout, a:visited#menulogout {
+  color: #000;
+}
+
+.main-header .whatsapp.icon {
+  font-size: 1em !important;
+}
+
+.main-header .whatsapp.icon:hover {
+  transform: scale(1.1);
+  background: rgba(255, 255, 255, 0.2);
+}
+
+@media (min-width: 768px) {
+  .main-header {
+      padding: 2em !important;
+  }
+
+  .main-header .ui.header {
+      flex-direction: column;
+  }
+
+  .main-header .version-label {
+      margin-top: 4px !important;
+  }
+}
+
+.ui.header {
+  font-weight: 600 !important;
+  color: var(--text-color) !important;
+}
+
+.ui.cards > .card {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05) !important;
+  border-radius: 16px !important;
+  margin: 0.7em !important;
+  background-color: var(--message-background) !important;
+  border: 1px solid rgba(18, 140, 126, 0.1);
+}
+
+.ui.cards > .card:not(.no-hover):hover {
+  transform: translateY(-8px) !important;
+  box-shadow: 0 12px 24px rgba(18, 140, 126, 0.15) !important;
+  background-color: var(--card-hover-color) !important;
+}
+
+.ui.horizontal.divider {
+  font-size: 1.3em !important;
+  color: var(--secondary-color) !important;
+  margin: 2.5em 0 !important;
+  font-weight: 700 !important;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.ui.success.message {
+  border-radius: 16px !important;
+  box-shadow: 0 4px 8px rgba(37, 211, 102, 0.1) !important;
+  border: 1px solid rgba(37, 211, 102, 0.2) !important;
+  background-color: rgba(231, 247, 232, 0.8) !important;
+  color: var(--success-green) !important;
+  animation: slideIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  backdrop-filter: blur(10px);
+}
+
+@keyframes slideIn {
+  from { transform: translateX(-30px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+.ui.button {
+  border-radius: 12px !important;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+  color: white !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.5px;
+}
+
+.ui.button:hover {
+  transform: translateY(-3px) !important;
+  box-shadow: 0 8px 16px rgba(0, 168, 132, 0.2) !important;
+  filter: brightness(0.95);
+}
+
+.ui.form input, .ui.form textarea {
+  border-radius: 12px !important;
+  border: 2px solid rgba(18, 140, 126, 0.1) !important;
+  transition: all 0.3s ease;
+}
+
+.ui.form input:focus, .ui.form textarea:focus {
+  border-color: var(--primary-color) !important;
+  box-shadow: 0 0 0 3px rgba(0, 168, 132, 0.1) !important;
+}
+
+.ui.grid {
+  margin: -0.7em !important;
+}
+
+.ui.grid > .column {
+  padding: 0.7em !important;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.ui.modal {
+  border-radius: 20px !important;
+  background-color: var(--message-background) !important;
+  overflow: hidden;
+}
+
+.ui.modal > .header {
+  border-radius: 20px 20px 0 0 !important;
+  background: var(--gradient-start) !important;
+  color: white !important;
+  padding: 1.5em !important;
+}
+
+.ui.modal > .actions {
+  border-radius: 0 0 20px 20px !important;
+  background-color: rgba(248, 248, 248, 0.8) !important;
+  backdrop-filter: blur(10px);
+}
+
+.ui.modal > .actions > .ui.button {
+  font-weight: 600 !important;
+  letter-spacing: 0.5px;
+}
+
+.mb-4 {
+  margin-bottom: 1.5em !important;
+}
+
+#user-role-indicator.admin {
+  color: #db2828; 
+  font-weight: bold;
+}
+  
+#user-role-indicator.admin div.label {
+  background-color:#d31616; 
+}
+
+#user-role-indicator.admin i.icon {
+  color:#d31616;
+}
+  
+#user-role-indicator.user {
+  color: #a3f298;
+}
+  
+#user-role-indicator.user i.icon {
+  color: #a3f298;
+}
+  
+#user-role-indicator.user div.label {
+  background-color: #a3f298;
+  color: #000;
+}
+
+.ui.secondary.pointing.menu {
+  margin-bottom: 0;
+  border-bottom: none;
+}
+
+.p1 {
+  padding-right:1em;
+  padding-left:1em;
+}
+
+.adminlogin {
+  display:none;
+}
+
+.required {
+  color: #db2828;
+}
+
+/* Groups Specific Styles */
+.group-card {
+  transition: all 0.3s ease !important;
+  max-height: 180px !important;
+}
+
+.group-card:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 4px 12px rgba(0, 168, 132, 0.15) !important;
+}
+
+.group-card .content {
+  padding: 1em !important;
+}
+
+.group-card .header {
+  font-size: 1.1em !important;
+  margin-bottom: 0.3em !important;
+  font-weight: 600 !important;
+}
+
+.group-photo {
+  width: 45px !important;
+  height: 45px !important;
+  border-radius: 50% !important;
+  object-fit: cover !important;
+}
+
+.group-photo-placeholder {
+  width: 45px !important;
+  height: 45px !important;
+  border-radius: 50% !important;
+  background: var(--primary-color) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  color: white !important;
+  font-size: 1.2em !important;
+}
+
+.participant-item {
+  padding: 0.75rem 0 !important;
+}
+
+.participant-item .content .header {
+  font-size: 1rem !important;
+}
+
+.participant-item .right.floated.content {
+  float: none !important;
+  margin-top: 0.5rem !important;
+}
+
+.admin-badge {
+  background: #f2711c !important;
+  color: white !important;
+  font-size: 0.7em !important;
+  padding: 0.2em 0.4em !important;
+  border-radius: 3px !important;
+  margin-left: 0.5em !important;
+}
+
+.super-admin-badge {
+  background: #db2828 !important;
+  color: white !important;
+  font-size: 0.7em !important;
+  padding: 0.2em 0.4em !important;
+  border-radius: 3px !important;
+  margin-left: 0.5em !important;
+}
+
+.group-stats {
+  display: flex !important;
+  gap: 0.8em !important;
+  margin-top: 0.4em !important;
+  flex-wrap: wrap !important;
+}
+
+.group-stat {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.2em !important;
+  font-size: 0.8em !important;
+  color: #666 !important;
+}
+
+.groups-search-container {
+  margin-bottom: 1em !important;
+}
+
+.group-actions {
+  display: flex !important;
+  gap: 0.3em !important;
+  margin-top: 0.8em !important;
+}
+
+.group-action-btn {
+  flex: 1 !important;
+  font-size: 0.7em !important;
+  padding: 0.4em 0.6em !important;
+}
+
+.group-card .description {
+  font-size: 0.85em !important;
+  color: #666 !important;
+  margin-bottom: 0.4em !important;
+  line-height: 1.3 !important;
+}
+
+.read-more-link {
+  color: var(--primary-color) !important;
+  text-decoration: none !important;
+  font-weight: 500 !important;
+}
+
+.read-more-link:hover {
+  text-decoration: underline !important;
+}
+
+.group-preview-photo {
+  width: 80px !important;
+  height: 80px !important;
+  border-radius: 50% !important;
+  object-fit: cover !important;
+  margin-right: 1em !important;
+}
+
+.disappearing-timer-indicator {
+  color: var(--primary-color) !important;
+  font-weight: bold !important;
+}
+
+.invite-link-container {
+  background: #f8f9fa !important;
+  padding: 1em !important;
+  border-radius: 8px !important;
+  border: 1px solid #e9ecef !important;
+}
+
+.participant-actions {
+  display: flex !important;
+  gap: 0.3em !important;
+}
+
+.participant-action-btn {
+  padding: 0.3em 0.6em !important;
+  font-size: 0.7em !important;
+}
+
+@media (max-width: 768px) {
+  .group-actions {
+    flex-direction: column !important;
+  }
+  
+  .group-action-btn {
+    width: 100% !important;
+  }
+  
+  .group-stats {
+    flex-direction: column !important;
+    gap: 0.5em !important;
+  }
+}
+
+/* Groups Manager Styles */
+#groupsMainContainer .main-header {
+    margin-bottom: 2em !important;
+}
+
+#groupsMainContainer .main-header .ui.header {
+    color: white !important;
+}
+
+#groupsMainContainer .main-header .sub.header {
+    color: rgba(255, 255, 255, 0.8) !important;
+}
+
+.group-list-item {
+    padding: 1rem 0;
+    transition: background-color 0.3s ease;
+    border-radius: 4px;
+    margin: 0.5rem 0;
+}
+
+.group-list-item:hover {
+    background-color: #f8f9fa;
+}
+
+.group-list-item .header {
+    font-size: 1.1em;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.group-list-item .meta {
+    color: #666;
+    font-size: 0.9em;
+}
+
+.group-list-item .meta span {
+    margin-right: 1rem;
+}
+
+.group-list-item .description {
+    margin: 0.5rem 0;
+    color: #555;
+    line-height: 1.4;
+}
+
+.read-more-link {
+    color: #0084ff;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.read-more-link:hover {
+    text-decoration: underline;
+}
+
+/* Group type and role badges */
+.group-list-item .ui.mini.label {
+    margin-left: 0.5rem;
+    vertical-align: middle;
+}
+
+/* Group action buttons */
+.group-list-item .ui.small.buttons .button {
+    border: none !important;
+    font-weight: 600 !important;
+    border-radius: 8px !important;
+    transition: all 0.3s ease !important;
+    margin-right: 0.5rem !important;
+}
+
+.group-list-item .ui.small.buttons .button.primary {
+    background-color: var(--primary-color) !important;
+    color: white !important;
+}
+
+.group-list-item .ui.small.buttons .button.primary:hover {
+    background-color: var(--secondary-color) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 12px rgba(0, 168, 132, 0.3) !important;
+}
+
+.group-list-item .ui.small.buttons .button.secondary {
+    background-color: #6c757d !important;
+    color: white !important;
+}
+
+.group-list-item .ui.small.buttons .button.secondary:hover {
+    background-color: #5a6268 !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3) !important;
+}
+
+.group-list-item .ui.small.buttons .button.loading {
+    pointer-events: none;
+    opacity: 0.7;
+}
+
+/* Remove the old basic button styles for groups */
+.group-list-item .ui.small.basic.buttons .button {
+    border: none !important;
+}
+
+.group-list-item .ui.small.basic.buttons .button:hover {
+    border: none !important;
+}
+
+/* Participant item styles */
+.participant-item {
+    padding: 0.75rem 0 !important;
+}
+
+.participant-item .content .header {
+    font-size: 1rem !important;
+}
+
+.participant-item .right.floated.content {
+    float: none !important;
+    margin-top: 0.5rem !important;
+}
+
+/* Groups loading state */
+#groupsLoading {
+    min-height: 200px;
+}
+
+/* Groups filter section */
+#groupsMainContainer .ui.segment {
+    border: 1px solid #e1e8ed;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+    margin-bottom: 1rem;
+}
+
+/* No groups message */
+#noGroupsMessage {
+    margin-top: 2rem;
+    text-align: center;
+}
+
+/* Responsive design for groups */
+@media (max-width: 768px) {
+    .group-list-item .ui.grid .column {
+        padding: 0.5rem;
+    }
+    
+    .group-list-item .four.wide.column {
+        width: 100% !important;
+        text-align: left !important;
+        margin-top: 1rem;
+    }
+    
+    .group-list-item .eleven.wide.column {
+        width: 100% !important;
+    }
+    
+    .group-list-item .one.wide.column {
+        width: auto !important;
+        margin-right: 1rem;
+    }
+}
+
+/* Group type specific styling */
+.group-list-item .ui.mini.label.purple {
+    background-color: #8e44ad !important;
+    color: white !important;
+}
+
+.group-list-item .ui.mini.label.blue {
+    background-color: #3498db !important;
+    color: white !important;
+}
+
+.group-list-item .ui.mini.label.green {
+    background-color: var(--success-green) !important;
+    color: white !important;
+}
+
+/* Group icons with specific colors */
+.group-list-item .building.icon.purple {
+    color: #8e44ad !important;
+}
+
+.group-list-item .users.icon.blue {
+    color: #3498db !important;
+}
+
+.group-list-item .users.icon.green {
+    color: var(--success-green) !important;
+}
+
+/* Feature badges styling */
+.group-list-item .ui.mini.grey.label {
+    background-color: #95a5a6 !important;
+    color: white !important;
+    margin: 0.2rem 0.3rem 0.2rem 0 !important;
+}
+
+/* Role badges styling */
+.group-list-item .ui.mini.red.label,
+.group-list-item .ui.mini.orange.label {
+    font-weight: bold !important;
+    margin-left: 0.5rem !important;
+}
+
+/* Parent community info styling */
+.group-list-item .meta .sitemap.icon {
+    color: #8e44ad !important;
+}
+
+/* Improved meta information spacing */
+.group-list-item .meta {
+    margin-top: 0.5rem !important;
+    line-height: 1.6 !important;
+}
+
+.group-list-item .meta span {
+    margin-right: 1rem !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 0.3rem !important;
+}
+
+/* Refresh button styling */
+#refreshGroups.ui.button {
+    background-color: var(--secondary-color) !important;
+    color: white !important;
+    border: none !important;
+    font-weight: 600 !important;
+}
+
+#refreshGroups.ui.button:hover {
+    background-color: var(--tertiary-color) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 12px rgba(7, 94, 84, 0.3) !important;
+}
+
+/* Modal responsiveness improvements */
+.ui.modal#modalGroupDetails {
+    max-width: 90vw !important;
+    width: auto !important;
+}
+
+.ui.modal#modalGroupDetails .content {
+    max-height: 70vh !important;
+    overflow-y: auto !important;
+}
+
+.ui.modal#modalGroupDetails .actions .ui.stackable.buttons {
+    flex-wrap: wrap !important;
+}
+
+.ui.modal#modalGroupDetails .actions .ui.stackable.buttons .button {
+    flex: 1 1 auto !important;
+    min-width: 120px !important;
+    margin: 0.25rem !important;
+}
+
+/* Mobile responsiveness for group details */
+@media (max-width: 768px) {
+    .ui.modal#modalGroupDetails {
+        margin: 1rem !important;
+        max-width: calc(100vw - 2rem) !important;
+    }
+    
+    .ui.modal#modalGroupDetails .actions .ui.stackable.buttons {
+        flex-direction: column !important;
+    }
+    
+    .ui.modal#modalGroupDetails .actions .ui.stackable.buttons .button {
+        width: 100% !important;
+        margin: 0.25rem 0 !important;
+    }
+    
+    .participant-item {
+        padding: 0.75rem 0 !important;
+    }
+    
+    .participant-item .content .header {
+        font-size: 1rem !important;
+    }
+    
+    .participant-item .right.floated.content {
+        float: none !important;
+        margin-top: 0.5rem !important;
+    }
+}
+
+/* Groups filter section button styling */
+.ui.segment .ui.basic.buttons .ui.button {
+    background-color: var(--secondary-color) !important;
+    color: white !important;
+    border: none !important;
+    font-weight: 600 !important;
+}
+
+.ui.segment .ui.basic.buttons .ui.button:hover {
+    background-color: var(--tertiary-color) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 12px rgba(7, 94, 84, 0.3) !important;
+}
+
+/* Group Management Modal Styles */
+.ui.modal#modalEditGroupInfo,
+.ui.modal#modalGroupSettings,
+.ui.modal#modalGroupInviteLink,
+.ui.modal#modalManageParticipants {
+    max-width: 90vw !important;
+    width: auto !important;
+}
+
+.ui.modal#modalManageParticipants {
+    max-width: 95vw !important;
+}
+
+.ui.modal#modalEditGroupInfo .content,
+.ui.modal#modalGroupSettings .content,
+.ui.modal#modalGroupInviteLink .content,
+.ui.modal#modalManageParticipants .content {
+    max-height: 70vh !important;
+    overflow-y: auto !important;
+}
+
+/* Group Details Modal Actions Grid */
+.ui.modal#modalGroupDetails .actions .ui.stackable.grid {
+    margin: 0 !important;
+}
+
+.ui.modal#modalGroupDetails .actions .ui.stackable.grid .column {
+    padding: 0.5rem !important;
+}
+
+.ui.modal#modalGroupDetails .actions h5.ui.header {
+    margin-top: 0 !important;
+    margin-bottom: 0.5rem !important;
+    color: var(--secondary-color) !important;
+}
+
+/* Group Settings Sections */
+.ui.modal#modalGroupSettings .ui.dividing.header {
+    color: var(--secondary-color) !important;
+    border-bottom-color: rgba(0, 168, 132, 0.2) !important;
+}
+
+.ui.modal#modalGroupSettings .ui.toggle.checkbox {
+    margin-bottom: 0.5rem !important;
+}
+
+/* Group Photo Container */
+#currentGroupPhotoContainer {
+    min-height: 80px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+#currentGroupPhotoContainer img {
+    max-width: 80px !important;
+    max-height: 80px !important;
+    border-radius: 50% !important;
+    object-fit: cover !important;
+}
+
+/* Invite Link Input */
+.ui.modal#modalGroupInviteLink .ui.action.input {
+    margin-bottom: 1rem !important;
+}
+
+/* Participants Management */
+.ui.modal#modalManageParticipants .ui.header {
+    color: var(--secondary-color) !important;
+}
+
+.ui.modal#modalManageParticipants .ui.info.message {
+    border-radius: 8px !important;
+    border-color: rgba(0, 168, 132, 0.3) !important;
+    background-color: rgba(0, 168, 132, 0.05) !important;
+}
+
+/* Participant Item in Management */
+.ui.modal#modalManageParticipants .participant-item {
+    padding: 0.75rem 0 !important;
+    border-bottom: 1px solid #f0f0f0 !important;
+}
+
+.ui.modal#modalManageParticipants .participant-item:last-child {
+    border-bottom: none !important;
+}
+
+.ui.modal#modalManageParticipants .participant-item .ui.mini.button {
+    font-size: 0.7rem !important;
+    padding: 0.4rem 0.6rem !important;
+}
+
+.ui.modal#modalManageParticipants .participant-item .ui.mini.buttons {
+    margin-bottom: 0.5rem !important;
+}
+
+.ui.modal#modalManageParticipants .participant-item .ui.mini.buttons .button {
+    margin: 0.1rem !important;
+}
+
+/* Participant action buttons styling */
+.ui.modal#modalManageParticipants .participant-item .ui.mini.red.button {
+    background-color: #db2828 !important;
+    color: white !important;
+}
+
+.ui.modal#modalManageParticipants .participant-item .ui.mini.red.button:hover {
+    background-color: #c82121 !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 2px 8px rgba(219, 40, 40, 0.3) !important;
+}
+
+.ui.modal#modalManageParticipants .participant-item .ui.mini.orange.button {
+    background-color: #f2711c !important;
+    color: white !important;
+}
+
+.ui.modal#modalManageParticipants .participant-item .ui.mini.orange.button:hover {
+    background-color: #e55a00 !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 2px 8px rgba(242, 113, 28, 0.3) !important;
+}
+
+.ui.modal#modalManageParticipants .participant-item .ui.mini.grey.button {
+    background-color: #767676 !important;
+    color: white !important;
+}
+
+.ui.modal#modalManageParticipants .participant-item .ui.mini.grey.button:hover {
+    background-color: #666666 !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 2px 8px rgba(118, 118, 118, 0.3) !important;
+}
+
+/* Participant item content layout */
+.ui.modal#modalManageParticipants .participant-item .content {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: flex-start !important;
+    width: 100% !important;
+}
+
+.ui.modal#modalManageParticipants .participant-item .participant-info {
+    flex: 1 !important;
+}
+
+.ui.modal#modalManageParticipants .participant-item .participant-actions {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-end !important;
+    gap: 0.5rem !important;
+    margin-left: 1rem !important;
+}
+
+.ui.modal#modalManageParticipants .participant-item .participant-labels {
+    display: flex !important;
+    gap: 0.3rem !important;
+    flex-wrap: wrap !important;
+    justify-content: flex-end !important;
+}
+
+.ui.modal#modalManageParticipants .participant-item .participant-buttons .right.floated.content {
+    float: none !important;
+    margin: 0 !important;
+}
+
+/* Proxy Configuration Styles */
+#proxyUrlField {
+  display: none;
+}
+
+#proxyUrlField.show {
+  display: block;
+}
+
+/* S3 Configuration Styles */
+#deleteS3Config {
+  display: none;
+}
+
+/* Mobile Responsiveness for Group Management */
+@media (max-width: 768px) {
+    .ui.modal#modalGroupDetails .actions .ui.stackable.grid .column {
+        width: 100% !important;
+        margin-bottom: 1rem !important;
+    }
+    
+    .ui.modal#modalGroupDetails .actions .ui.fluid.buttons {
+        flex-direction: column !important;
+    }
+    
+    .ui.modal#modalGroupDetails .actions .ui.fluid.buttons .button {
+        margin: 0.25rem 0 !important;
+        width: 100% !important;
+    }
+    
+    .ui.modal#modalManageParticipants .ui.stackable.grid .column {
+        width: 100% !important;
+        margin-bottom: 2rem !important;
+    }
+    
+    .ui.modal#modalGroupSettings .ui.segment .ui.stackable.grid .column {
+        width: 100% !important;
+        text-align: center !important;
+    }
+    
+    .ui.modal#modalGroupSettings .ui.buttons {
+        flex-direction: column !important;
+    }
+    
+    .ui.modal#modalGroupSettings .ui.buttons .button {
+        margin: 0.25rem 0 !important;
+        width: 100% !important;
+    }
+    
+    /* Mobile layout for participant items */
+    .ui.modal#modalManageParticipants .participant-item .content {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+    }
+    
+    .ui.modal#modalManageParticipants .participant-item .participant-actions {
+        margin-left: 0 !important;
+        margin-top: 0.5rem !important;
+        align-items: flex-start !important;
+        width: 100% !important;
+    }
+    
+    .ui.modal#modalManageParticipants .participant-item .participant-labels {
+        justify-content: flex-start !important;
+        margin-bottom: 0.5rem !important;
+    }
+    
+    .ui.modal#modalManageParticipants .participant-item .ui.mini.buttons {
+        width: 100% !important;
+    }
+    
+    .ui.modal#modalManageParticipants .participant-item .ui.mini.buttons .button {
+        flex: 1 !important;
+        margin: 0.1rem !important;
+    }
+}
+
+/* Button Styling for Group Actions */
+.ui.modal .actions .ui.button {
+    border-radius: 8px !important;
+    font-weight: 600 !important;
+    transition: all 0.3s ease !important;
+}
+
+.ui.modal .actions .ui.blue.button {
+    background-color: var(--primary-color) !important;
+    color: white !important;
+}
+
+.ui.modal .actions .ui.blue.button:hover {
+    background-color: var(--secondary-color) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 12px rgba(0, 168, 132, 0.3) !important;
+}
+
+.ui.modal .actions .ui.green.button {
+    background-color: var(--success-green) !important;
+    color: white !important;
+}
+
+.ui.modal .actions .ui.green.button:hover {
+    background-color: var(--secondary-color) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 12px rgba(0, 168, 132, 0.3) !important;
+}
+
+.ui.modal .actions .ui.orange.button {
+    background-color: #f2711c !important;
+    color: white !important;
+}
+
+.ui.modal .actions .ui.orange.button:hover {
+    background-color: #e55a00 !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 12px rgba(242, 113, 28, 0.3) !important;
+}
+
+.ui.modal .actions .ui.purple.button {
+    background-color: #8e44ad !important;
+    color: white !important;
+}
+
+.ui.modal .actions .ui.purple.button:hover {
+    background-color: #7d3c98 !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 12px rgba(142, 68, 173, 0.3) !important;
+}
+
+/* Loading States */
+.ui.modal .ui.button.loading {
+    pointer-events: none !important;
+    opacity: 0.7 !important;
+}
+
+/* Form Validation */
+.ui.modal .ui.form .field.error input,
+.ui.modal .ui.form .field.error textarea {
+    border-color: #db2828 !important;
+    box-shadow: 0 0 0 3px rgba(219, 40, 40, 0.1) !important;
+}
+
+/* Success/Error Messages in Modals */
+.ui.modal .ui.success.message {
+    border-radius: 8px !important;
+    border-color: rgba(0, 168, 132, 0.3) !important;
+    background-color: rgba(0, 168, 132, 0.05) !important;
+    color: var(--success-green) !important;
+}
+
+.ui.modal .ui.error.message {
+    border-radius: 8px !important;
+    border-color: rgba(219, 40, 40, 0.3) !important;
+    background-color: rgba(219, 40, 40, 0.05) !important;
+    color: #db2828 !important;
+}

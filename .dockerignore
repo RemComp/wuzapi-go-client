@@ -1,0 +1,33 @@
+.git
+.gitignore
+.github
+
+# Development files
+.env
+.env.*
+*.log
+.tool-versions
+
+# Data directories (will be mounted as volumes)
+dbdata/
+files/
+
+# Build artifacts and binaries
+wuzapi
+*.exe
+*.o
+*.out
+
+# Documentation
+README.md
+API.md
+LICENSE
+*.md
+
+# Others
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*.swo
+tmp/

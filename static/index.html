@@ -1,151 +1,392 @@
-<!-- ?xml version='1.0' encoding='UTF-8'? -->
-<link href="/github-markdown-css/github-css.css" rel="stylesheet"/>
-<meta charset="utf-8" content="text/html"/>
-<div class="gist">
-<style class="formula-style">
-        svg.gh-md-to-html-formula {
-            fill: black;
-        }
-    </style>
-<div class="gist-file"> <!-- This is the class that is responsible for the boxing! -->
-<div class="gist-data">
-<div class="js-gist-file-update-container js-task-list-container file-box">
-<div class="file" id="user-content-article-README">
-<div class="Box-body readme blob js-code-block-container p-5 p-xl-6" id="user-content-file-docker-image-pull-md-readme" style="margin-left: 40px; margin-right: 40px; margin-top: 20px; margin-bottom: 20px">
-<article class="markdown-body entry-content container-lg" itemprop="text">
-<h1 id="user-content-wuzapi">
-<a aria-hidden="true" class="anchor" href="#user-content-wuzapi" id="user-content-wuzapi" name="user-content-wuzapi"><span aria-hidden="true" class="octicon octicon-link"></span></a>WUZAPI</h1>
-<p><a href="/images/favicon.png" rel="noopener noreferrer" target="_blank"><img data-canonical-src="/images/favicon.png" src="/images/favicon.png" style="max-width:100%; max-height: 512px;" width="30"/></a> WuzAPI is an implementation
-of <a href="https://github.com/tulir/whatsmeow">@tulir/whatsmeow</a> library as a
-simple RESTful API service with multiple device support and concurrent
-sessions.</p>
-<p>Whatsmeow does not use Puppeteer on headless Chrome, nor an Android emulator.
-It talks directly to WhatsApp websocket servers, thus is quite fast and uses
-much less memory and CPU than those solutions. The drawback is that a change
-in the WhatsApp protocol could break connections and will require a library
-update.</p>
-<h2 id="user-content-ezf3weaa2uhg9u52fwkic-warning">
-<a aria-hidden="true" class="anchor" href="#user-content-ezf3weaa2uhg9u52fwkic-warning" id="user-content-ezf3weaa2uhg9u52fwkic-warning" name="user-content-ezf3weaa2uhg9u52fwkic-warning"><span aria-hidden="true" class="octicon octicon-link"></span></a>⚠️ Warning</h2>
-<p><strong>Using this software violating WhatsApp ToS can get your number banned</strong>:
-Be very careful, do not use this to send SPAM or anything like it. Use at
-your own risk. If you need to develop something with commercial interest
-you should contact a WhatsApp global solution provider and sign up for the
-Whatsapp Business API service instead.</p>
-<h2 id="user-content-available-endpoints">
-<a aria-hidden="true" class="anchor" href="#user-content-available-endpoints" id="user-content-available-endpoints" name="user-content-available-endpoints"><span aria-hidden="true" class="octicon octicon-link"></span></a>Available endpoints</h2>
-<ul>
-<li>Session: connect, disconnect and logout from WhatsApp. Retrieve
-connection status. Retrieve QR code for scanning.</li>
-<li>Messages: send text, image, audio, document, template, video, sticker,
-location and contact messages.</li>
-<li>Users: check if phones have whatsapp, get user information, get user avatar,
-retrieve full contact list.</li>
-<li>Chat: set presence (typing/paused,recording media), mark messages as read,
-download images from messages.</li>
-<li>Groups: list subscribed, get info, get invite links, change photo and name.</li>
-<li>Webhooks: set and get webhook that will be called whenever an event/message
-are received.</li>
-</ul>
-<h2 id="user-content-prerequisites">
-<a aria-hidden="true" class="anchor" href="#user-content-prerequisites" id="user-content-prerequisites" name="user-content-prerequisites"><span aria-hidden="true" class="octicon octicon-link"></span></a>Prerequisites</h2>
-<p>Packages:</p>
-<ul>
-<li>Go (Go Programming Language)</li>
-</ul>
-<p>Optional:</p>
-<ul>
-<li>Docker (Containerization)</li>
-</ul>
-<h2 id="user-content-building">
-<a aria-hidden="true" class="anchor" href="#user-content-building" id="user-content-building" name="user-content-building"><span aria-hidden="true" class="octicon octicon-link"></span></a>Building</h2>
-<pre><code>go build .
-</code></pre>
-<h2 id="user-content-run">
-<a aria-hidden="true" class="anchor" href="#user-content-run" id="user-content-run" name="user-content-run"><span aria-hidden="true" class="octicon octicon-link"></span></a>Run</h2>
-<p>By default it will start a REST service in port 8080. These are the parameters
-you can use to alter behaviour</p>
-<ul>
-<li>-address  : sets the IP address to bind the server to (default 0.0.0.0)</li>
-<li>-port  : sets the port number (default 8080)</li>
-<li>-logtype : format for logs, either console (default) or json</li>
-<li>-wadebug : enable whatsmeow debug, either INFO or DEBUG levels are suported</li>
-<li>-sslcertificate : SSL Certificate File</li>
-<li>-sslprivatekey : SSL Private Key File</li>
-</ul>
-<p>Example:</p>
-<pre><code>./wuzapi -logtype json
-</code></pre>
-<h2 id="user-content-usage">
-<a aria-hidden="true" class="anchor" href="#user-content-usage" id="user-content-usage" name="user-content-usage"><span aria-hidden="true" class="octicon octicon-link"></span></a>Usage</h2>
-<p>In order to open up sessions, you first need to create a user and set an
-authentication token for it. You can do so by updating the SQLite <em>users.db</em>
-database:</p>
-<pre><code>sqlite3 dbdata/users.db "insert into users ('name','token') values ('John','1234ABCD')" 
-</code></pre>
-<p>Once you have some users created, you can talk to the API passing the <strong>Token</strong>
-header as a simple means of authentication. You can have several users
-(different numbers), on the same server.</p>
-<p>The daemon also serves some static web files, useful for development/testing
-that you can load with your browser:</p>
-<ul>
-<li>An API swagger reference in <a href="/api">/api</a> A sample web page to connect and</li>
-<li>scan QR codes in <a href="/login">/login</a> (where you will need to pass
-?token=1234ABCD)</li>
-</ul>
-<h2 id="user-content-api-reference">
-<a aria-hidden="true" class="anchor" href="#user-content-api-reference" id="user-content-api-reference" name="user-content-api-reference"><span aria-hidden="true" class="octicon octicon-link"></span></a>API reference</h2>
-<p>API calls should be made with content type json, and parameters sent into the
-request body, always passing the Token header for authenticating the request.</p>
-<p>Check the Swagger <a href="/api">API Reference</a></p>
-<h2 id="user-content-license">
-<a aria-hidden="true" class="anchor" href="#user-content-license" id="user-content-license" name="user-content-license"><span aria-hidden="true" class="octicon octicon-link"></span></a>License</h2>
-<p>Copyright © 2022 Nicolás Gudiño</p>
-<p><a href="https://choosealicense.com/licenses/mit/" rel="nofollow">MIT</a></p>
-<p>Permission is hereby granted, free of charge, to any person obtaining a copy of
-this software and associated documentation files (the "Software"), to deal in
-the Software without restriction, including without limitation the rights to
-use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
-of the Software, and to permit persons to whom the Software is furnished to do
-so, subject to the following conditions:</p>
-<p>The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.</p>
-<p>THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.</p>
-<h2 id="user-content-icon-attribution">
-<a aria-hidden="true" class="anchor" href="#user-content-icon-attribution" id="user-content-icon-attribution" name="user-content-icon-attribution"><span aria-hidden="true" class="octicon octicon-link"></span></a>Icon Attribution</h2>
-<p><a href="https://www.flaticon.com/free-icons/communication" rel="nofollow">Communication icons created by Vectors Market -
-Flaticon</a></p>
-<h2 id="user-content-legal">
-<a aria-hidden="true" class="anchor" href="#user-content-legal" id="user-content-legal" name="user-content-legal"><span aria-hidden="true" class="octicon octicon-link"></span></a>Legal</h2>
-<p>This code is in no way affiliated with, authorized, maintained, sponsored or
-endorsed by WhatsApp or any of its affiliates or subsidiaries. This is an
-independent and unofficial software. Use at your own risk.</p>
-<h2 id="user-content-cryptography-notice">
-<a aria-hidden="true" class="anchor" href="#user-content-cryptography-notice" id="user-content-cryptography-notice" name="user-content-cryptography-notice"><span aria-hidden="true" class="octicon octicon-link"></span></a>Cryptography Notice</h2>
-<p>This distribution includes cryptographic software. The country in which you
-currently reside may have restrictions on the import, possession, use, and/or
-re-export to another country, of encryption software. BEFORE using any
-encryption software, please check your country's laws, regulations and policies
-concerning the import, possession, or use, and re-export of encryption
-software, to see if this is permitted. See
-<a href="http://www.wassenaar.org/" rel="nofollow">http://www.wassenaar.org/</a> for more information.</p>
-<p>The U.S. Government Department of Commerce, Bureau of Industry and Security
-(BIS), has classified this software as Export Commodity Control Number (ECCN)
-5D002.C.1, which includes information security software using or performing
-cryptographic functions with asymmetric algorithms. The form and manner of this
-distribution makes it eligible for export under the License Exception ENC
-Technology Software Unrestricted (TSU) exception (see the BIS Export
-Administration Regulations, Section 740.13) for both object code and source
-code.</p>
-</article>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
+<!DOCTYPE html>
+<html lang="en"> <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WUZAPI - REST API for WhatsApp</title>
+    <link rel="icon" href="/images/favicon.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <div class="logo">
+                <img src="/images/favicon.png" alt="WUZAPI Logo">
+                <h1>WUZAPI</h1>
+            </div>
+
+            <button class="menu-toggle" aria-label="Toggle menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            
+            <nav>
+                <ul id="main-menu">
+                    <li><a href="#features">Features</a></li>
+                    <li><a href="#api">API</a></li>
+                    <li><a href="#demo">Demo</a></li>
+                    <li><a href="#usage">Documentation</a></li>
+                    <li><a href="#donate">Support Us</a></li>
+                    <li><a href="/dashboard" class="btn">Dashboard</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <h2 class="xfade-in">REST API for WhatsApp</h2>
+                <p class="xfade-in">WUZAPI is an implementation of the whatsmeow library as a simple RESTful API service, with support for multiple devices and concurrent sessions.</p>
+                <div class="btn-group xfade-in">
+                    <a href="/dashboard" class="btn"><i class="fas fa-tachometer-alt"></i> Access Dashboard</a>
+                    <a href="/api" class="btn"><i class="fas fa-code"></i> API Documentation</a>
+                    <a href="https://github.com/asternic/wuzapi" class="btn outline"><i class="fab fa-github"></i> GitHub</a>
+                </div>
+            </div>
+        </div>
+        <div class="scroll-down">
+            <span>Learn more</span>
+            <i class="fas fa-chevron-down"></i>
+        </div>
+    </section>
+
+    <section id="features" class="section features">
+        <div class="container">
+            <div class="section-title">
+                <h2>Main Features</h2>
+                <p>WUZAPI offers a complete API to interact with WhatsApp efficiently without using heavy resources like Puppeteer or Android emulators.</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">
+                        <i class="fas fa-bolt"></i>
+                    </div>
+                    <h3>High Performance</h3>
+                    <p>Direct communication with WhatsApp servers via websocket, resulting in lower memory and CPU usage.</p>
+                </div>
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h3>Multiple Sessions</h3>
+                    <p>Support for multiple devices and users simultaneously on the same instance.</p>
+                </div>
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">
+                        <i class="fas fa-comment-dots"></i>
+                    </div>
+                    <h3>Rich Messages</h3>
+                    <p>Send text, images, audio, documents, videos, stickers, location, and contacts.</p>
+                </div>
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">
+                        <i class="fas fa-bell"></i>
+                    </div>
+                    <h3>Webhooks</h3>
+                    <p>Configure webhooks to receive real-time notifications of events and messages.</p>
+                </div>
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">
+                        <i class="fas fa-user-check"></i>
+                    </div>
+                    <h3>User Verification</h3>
+                    <p>Check if phone numbers have WhatsApp and get profile information.</p>
+                </div>
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">
+                        <i class="fas fa-lock"></i>
+                    </div>
+                    <h3>Simple Authentication</h3>
+                    <p>Token system for easy and secure user authentication.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="api" class="section api-section">
+        <div class="container">
+            <div class="section-title">
+                <h2>API Endpoints</h2>
+                <p>WUZAPI offers several endpoints to interact with WhatsApp, organized into functional categories.</p>
+            </div>
+            <div class="api-endpoints">
+                <div class="endpoint-card slide-in-left">
+                    <h3><i class="fas fa-key"></i> Session</h3>
+                    <p>Manage WhatsApp sessions with ease.</p>
+                    <ul>
+                        <li>Connect to WhatsApp</li>
+                        <li>Disconnect, Logout</li>
+                        <li>Check connection status</li>
+                        <li>Get QR Code for scanning</li>
+                        <li>Pair by Phone Number</li>
+                        <li>Proxy configuration</li>
+                    </ul>
+                </div>
+                <div class="endpoint-card slide-in-right">
+                    <h3><i class="fas fa-comment"></i> Chat</h3>
+                    <p>Interact with chats and messages.</p>
+                    <ul>
+                        <li>Mark messages as read</li>
+                        <li>Delete messages</li>
+                        <li>Send reactions to messages</li>
+                        <li>Set presence (typing/recording)</li>
+                        <li>Download images</li>
+                        <li>Download videos</li>
+                        <li>Download documents</li>
+                    </ul>
+                </div>
+                <div class="endpoint-card slide-in-left">
+                    <h3><i class="fas fa-paper-plane"></i> Messages</h3>
+                    <p>Send different types of messages.</p>
+                    <ul>
+                        <li>Text, images, audio</li>
+                        <li>Documents, videos, stickers</li>
+                        <li>Location, contacts</li>
+                        <li>Templates with buttons</li>
+                    </ul>
+                </div>
+                <div class="endpoint-card slide-in-right">
+                    <h3><i class="fas fa-user"></i> Users</h3>
+                    <p>Get information about users.</p>
+                    <ul>
+                        <li>Check if numbers have WhatsApp</li>
+                        <li>Get profile information</li>
+                        <li>Get avatar/profile picture</li>
+                        <li>List contacts</li>
+                        <li>Set global presence</li>
+                    </ul>
+                </div>
+                <div class="endpoint-card slide-in-left">
+                    <h3><i class="fas fa-users"></i> Groups</h3>
+                    <p>Manage WhatsApp groups.</p>
+                    <ul>
+                        <li>List subscribed groups</li>
+                        <li>Get group information</li>
+                        <li>Get invite link</li>
+                        <li>Change group name</li>
+                        <li>Change group picture</li>
+                    </ul>
+                </div>
+                <div class="endpoint-card slide-in-right">
+                    <h3><i class="fas fa-bell"></i> Webhooks</h3>
+                    <p>Configure notifications for events.</p>
+                    <ul>
+                        <li>Set webhook URL</li>
+                        <li>Subscribe to specific events</li>
+                        <li>Update configuration</li>
+                        <li>Remove webhook</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="btn-group" style="margin-top: 2rem;">
+                <a href="/api" class="btn fade-in"><i class="fas fa-book"></i> Explore Full Documentation</a>
+            </div>
+        </div>
+    </section>
+
+    <section id="demo" class="section demo-section">
+        <div class="container">
+            <div class="section-title">
+                <h2>Interactive Demo</h2>
+                <p>See how easy it is to use the WUZAPI API to interact with WhatsApp.</p>
+            </div>
+            <div class="demo-container">
+                <div class="phone-mockup zoom-in">
+                    <div class="phone-screen">
+                        <div class="chat-header">
+                            <div class="chat-avatar">W</div>
+                            <div class="chat-info">
+                                <h4>WUZAPI Assistant</h4>
+                                <small>Online</small>
+                            </div>
+                        </div>
+                        <div class="chat-body">
+                            <!-- Chat messages will be added here by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+                <div class="demo-controls fade-in">
+                    <button class="demo-btn" data-scenario="message">Send Message</button>
+                    <button class="demo-btn" data-scenario="media">Send Media</button>
+                    <button class="demo-btn" data-scenario="webhook">Configure Webhook</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="warning-section container fade-in">
+        <h3><i class="fas fa-exclamation-triangle"></i> Important Warning</h3>
+        <p><strong>Using this software in violation of WhatsApp's Terms of Service may result in your number being banned</strong>. Be very careful, do not use it for SPAM or anything similar. Use at your own risk. If you need to develop something with commercial interest, contact a global WhatsApp solution provider and sign up for the WhatsApp Business API service.</p>
+    </div>
+
+    <section id="usage" class="section usage-section">
+        <div class="container">
+            <div class="section-title">
+                <h2>How to Use</h2>
+                <p>Instructions to start using WUZAPI quickly.</p>
+            </div>
+            
+            <div class="installation-steps">
+                <div class="step fade-in">
+                    <h3><i class="fas fa-list-ol"></i> Prerequisites</h3>
+                    <p>To run WUZAPI, you need:</p>
+                    <ul style="padding-left: 2em; margin-top:1em;">
+                        <li>Go (Go Programming Language)</li>
+                        <li>Docker (optional, for containerization)</li>
+                        <li>Postgres (optional, can work standalone using SQLite)</li>
+                    </ul>
+                </div>
+                
+                <div class="step fade-in">
+                    <h3><i class="fas fa-terminal"></i> Compilation</h3>
+                    <p>Compile the project with the following command:</p>
+                    <div class="code-block" data-language="bash">
+                        <pre>go build .</pre>
+                    </div>
+                </div>
+ 
+                <div class="step fade-in">
+                    <h3><i class="fas fa-cog"></i> Configuration</h3>
+                    <p>WuzAPI uses a .env file for configuration. Here are the required settings:</p>
+                    <h4>For PostgresSQL</h4>
+                    <div class="code-block" data-language="bash">
+<pre>WUZAPI_ADMIN_TOKEN=your_admin_token_here
+USER=wuzapi
+PASSWORD=wuzapi
+NAME=wuzapi
+HOST=localhost
+PORT=5432
+America/New_York</pre>
+                    </div>
+                    <h4>For SQLite</h4>
+                    <div class="code-block" data-language="bash">
+<pre>WUZAPI_ADMIN_TOKEN=your_admin_token_here
+TZ=America/New_York</pre>
+                  </div>
+                </div>
+                
+                <div class="step fade-in">
+                    <h3><i class="fas fa-play"></i> Execution</h3>
+                    <p>By default, the service will start on port 8080. You can change the behavior with the following parameters:</p>
+                    <ul style="padding-left: 2em; margin-top:1em;">
+                        <li><code>-address</code>: defines the IP address to bind the server (default 0.0.0.0)</li>
+                        <li><code>-port</code>: defines the port number (default 8080)</li>
+                        <li><code>-logtype</code>: format for logs, console (default) or json</li>
+                        <li><code>-wadebug</code>: enables whatsmeow debug, INFO or DEBUG levels are supported</li>
+                        <li><code>-sslcertificate</code>: SSL Certificate File</li>
+                        <li><code>-sslprivatekey</code>: SSL Private Key File</li>
+                        <li><code>-skipmedia</code>: Do not automatically download media from received messages</li>
+                        <li><code>-osname</code>: Connection OSName in Whatsapp (default "Mac OS 10")</li>
+                        <li><code>-admintoken</code>: Security Token to authorize admin actions (list/create/remove users)</li>
+                    </ul>
+                    <div style="margin-top:1em;">Example:</div>
+                    <div class="code-block" data-language="bash">
+                        <pre>./wuzapi -logtype json</pre>
+                    </div>
+                </div>
+                
+                <div class="step fade-in">
+                    <h3><i class="fas fa-user-plus"></i> Creating Users</h3>
+                    <p>To open sessions, you first need to create a user and define an authentication token for it. You can do this login into the <a href='/dashboard'>Dashboard</a>, or using the API directly:</p>
+                    <div class="code-block" data-language="bash">
+<pre>curl -X POST http://localhost:8080/admin/users \
+-H "Authorization: $WUZAPI_ADMIN_TOKEN" \
+-H "Content-Type: application/json" \
+-d '{"name": "John", "token": "Z1234ABCCXD"}'</pre>
+                    </div>
+                    <p>Once users are created, you can communicate with the API by passing the <strong>Token</strong> header as a simple authentication method. You can have multiple users (different numbers) on the same server. For every user you will need to Connect to whatsapp and then either scan a QR Code or Pair via phone number.</p>
+                </div>
+                
+                <div class="step fade-in">
+                    <h3><i class="fas fa-globe"></i> Web Resources</h3>
+                    <p>The daemon also serves some static web files, useful for development/testing that you can load with your browser:</p>
+                    <ul style="padding-left: 2em; margin-top:1em;">
+                        <li>A Swagger API reference at <a href="/api">/api</a></li>
+                        <li>An example web page to connect and scan QR codes at <a href="/login">/login</a> (where you will need to pass ?token=1234ABCD)</li>
+                        <li>A management dashboard at <a href="/dashboard">/dashboard</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="donate" class="section donation-section">
+        <div class="container">
+            <div class="donation-container fade-in">
+                <div class="donation-header">
+                    <h2>Support the Project</h2>
+                    <p>If you like WUZAPI and want to help keep the project active and in development, consider making a donation. Your support is very important!</p>
+                </div>
+                <div class="donation-options">
+                    <div class="donation-qrcode zoom-in">
+                        <h3>Scan to Donate</h3>
+                        <img src="/images/qr_donate.png" alt="QR Code for Donation">
+                        <p>Scan the QR code above with your banking app or digital wallet.</p>
+                    </div>
+                    <div class="donation-paypal zoom-in">
+                        <div class="coffee-cup">
+                            <i class="fas fa-mug-hot"></i>
+                            <div class="coffee-steam"></div>
+                        </div>
+                        <h3>Buy Me a Coffee</h3>
+                        <p>Or make a donation via PayPal:</p>
+                        <a href="https://www.paypal.com/donate/?hosted_button_id=ZV46M9NKE9M8L" target="_blank" class="donation-link">
+                            <img src="https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif" border="0" alt="Donate with PayPal">
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="footer-container">
+                <div class="footer-brand">
+                    <img src="/images/favicon.png" alt="WUZAPI Logo">
+                    <p>WUZAPI is a REST API for WhatsApp, implementing the whatsmeow library for direct communication with WhatsApp servers.</p>
+                    <div class="social-links">
+                        <a href="https://github.com/asternic/wuzapi" target="_blank" aria-label="GitHub Repository"><i class="fab fa-github"></i></a>
+                    </div>
+                </div>
+                <div class="footer-links">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="#features">Features</a></li>
+                        <li><a href="#api">API</a></li>
+                        <li><a href="#demo">Demo</a></li>
+                        <li><a href="#usage">Documentation</a></li>
+                        <li><a href="#donate">Support Us</a></li>
+                        <li><a href="/dashboard">Dashboard</a></li>
+                        <li><a href="/api">API Documentation</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h3>Support</h3>
+                    <ul>
+                        <li><a href="https://github.com/asternic/wuzapi/issues" target="_blank">Report Issues</a></li>
+                        <li><a href="https://github.com/asternic/wuzapi" target="_blank">Contribute</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>Copyright © 2025 Nicolás Gudiño and contributors</p>
+                <p>License <a href="https://choosealicense.com/licenses/mit/" target="_blank">MIT</a></p>
+                <p>This code is not affiliated with, authorized, maintained, sponsored, or endorsed by WhatsApp or any of its affiliates or subsidiaries.</p>
+            </div>
+        </div>
+    </footer>
+
+    <div class="theme-toggle" aria-label="Toggle light/dark mode">
+        <i class="fas fa-moon"></i>
+    </div>
+
+    <script src="/js/main.js"></script>
+</body>
+</html>

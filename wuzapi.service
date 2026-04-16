@@ -9,7 +9,7 @@ StartLimitBurst=5
 [Service]
 Restart=on-failure
 RestartSec=5s
-
+WorkingDirectory=/usr/local/wuzapi
 ExecStart=/usr/local/wuzapi/wuzapi -wadebug DEBUG
 
 [Install]
