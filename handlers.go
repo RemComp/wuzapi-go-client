@@ -5248,6 +5248,16 @@ func (s *server) ListUsers() http.HandlerFunc {
 				isLoggedIn = clientManager.GetWhatsmeowClient(user.Id).IsLoggedIn()
 			}
 
+			parseJidResult, err := types.ParseJID(user.Jid)
+			if err != nil {
+				log.Warn().Err(err).Str("user_id", user.Id).Msg("Failed to parse Jid")
+			}
+
+			respLid, err := clientManager.GetWhatsmeowClient(user.Id).Store.LIDs.GetLIDForPN(context.Background(), parseJidResult)
+			if err != nil {
+				log.Warn().Err(err).Str("user_id", user.Id).Msg("Failed to get LID for user")
+			}
+
 			//"connected":  user.Connected.Bool,
 			userMap := map[string]interface{}{
 				"id":         user.Id,
@@ -5255,6 +5265,7 @@ func (s *server) ListUsers() http.HandlerFunc {
 				"token":      user.Token,
 				"webhook":    user.Webhook,
 				"jid":        user.Jid,
+				"lid":        respLid,
 				"qrcode":     user.Qrcode,
 				"connected":  isConnected,
 				"loggedIn":   isLoggedIn,
