@@ -64,6 +64,7 @@ func sendToGlobalWebHook(jsonData []byte, token string, userID string) {
 			"jsonData":     jsonDataStr,
 			"userID":       userID,
 			"instanceName": instance_name,
+			"token":        token,
 		}
 		callHookWithHmac(*globalWebhook, globalData, userID, globalHMACKeyEncrypted)
 	}
@@ -84,6 +85,7 @@ func sendToUserWebHookWithHmac(webhookurl string, path string, jsonData []byte, 
 		"jsonData":     string(jsonData),
 		"userID":       userID,
 		"instanceName": instance_name,
+		"token":        token,
 	}
 
 	log.Debug().Interface("webhookData", data).Msg("Data being sent to webhook")
@@ -333,7 +335,7 @@ func parseJID(arg string) (types.JID, bool) {
 // Returns DESKTOP as default if the string doesn't match any known type
 func getPlatformTypeEnum(platformType string) *waCompanionReg.DeviceProps_PlatformType {
 	platformType = strings.ToUpper(strings.TrimSpace(platformType))
-	
+
 	switch platformType {
 	case "UNKNOWN":
 		return waCompanionReg.DeviceProps_UNKNOWN.Enum()
